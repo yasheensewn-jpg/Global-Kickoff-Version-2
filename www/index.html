@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Global Kickoff - Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Outfit', sans-serif;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+
+        /* Mobile Constraint Container */
+        #app-container {
+            width: 100%;
+            height: 100vh;
+            max-width: 450px; /* Mobile width */
+            position: relative;
+            overflow: hidden;
+            background-image: url('assets/Global%20Kickoff%20landing%20page.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Lower-third Form Overlay */
+        .form-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 20px;
+            padding-bottom: 5vh;
+            z-index: 2;
+        }
+
+        .auth-container {
+            width: 80%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px;
+        }
+
+        .input-group {
+            width: 100%;
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+        }
+
+        #password {
+            padding-right: 45px;
+        }
+
+        .stylized-input {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 25px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.85);
+            color: #111111;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .stylized-input::placeholder {
+            color: rgba(0, 0, 0, 0.6);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .stylized-input:focus {
+            border-color: #FFB75E;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 15px rgba(255, 183, 94, 0.6);
+        }
+
+        .primary-button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(180deg, #FFB75E 0%, #ED8F03 100%);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #C96E00, 0 10px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+            margin-top: 5px;
+        }
+
+        .primary-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #C96E00, 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .secondary-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .text-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            cursor: pointer;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            transition: color 0.2s;
+            padding: 12px 20px;
+            margin: -6px 0;
+        }
+
+        .text-link:hover {
+            color: #FFB75E;
+        }
+        
+        /* Media query for mobile to fill screen */
+        @media (max-width: 480px) {
+            #app-container {
+                max-width: 100%;
+                border-radius: 0;
+            }
+        }
+
+        @media (min-height: 800px) {
+            .form-overlay {
+                height: 38%;
+                bottom: 15%;
+            }
+        }
+        
+        /* iOS specific adjustment to pull form down into the green */
+        body.platform-ios .form-overlay {
+            bottom: 5% !important;
+        }
+
+        /* Android specific adjustment to shift login fields down */
+        body.platform-android .form-overlay {
+            transform: translateY(60px);
+            padding-bottom: 0 !important;
+        }
+        
+        #fb-browser-warning {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('assets/Sign%20in%20page.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            z-index: 999999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="verification-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+        <div style="background: #222; padding: 30px; border-radius: 20px; border: 1px solid #444; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <h1 style="color: #FFB75E; font-size: 1.5rem; margin-bottom: 15px; font-weight: 800; text-transform: uppercase;">Verify Your Email</h1>
+            <p style="color: #ddd; font-size: 1rem; line-height: 1.5; margin-bottom: 25px;">Please verify your account. Check your email and junk folders.</p>
+            <button id="resendEmailBtn" class="primary-button" style="margin-bottom: 10px;">Resend Email</button>
+            <button id="backToLoginBtn" class="primary-button" style="background: #444; box-shadow: 0 6px 0 #222;">Back to Login</button>
+        </div>
+    </div>
+
+    <div id="fb-browser-warning">
+        <div style="background: rgba(0,0,0,0.85); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h1 style="font-weight: 800; font-size: 1.6rem; margin-bottom: 15px; color: #FFB75E; text-transform: uppercase; letter-spacing: 1px;">For the best experience...</h1>
+            <p style="font-size: 1.05rem; font-weight: 400; line-height: 1.5; margin-bottom: 25px; color: #ddd;">
+                You are currently viewing this inside an in-app browser, which may prevent the game's audio and features from working correctly.
+            </p>
+            <p style="font-size: 1.1rem; font-weight: 600; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                Please tap the <span style="font-size: 1.5rem; vertical-align: middle;">•••</span> menu in the top right corner and select <br><br><span style="color: #FFB75E; font-weight: 800;">"Open in Safari"</span> or <span style="color: #FFB75E; font-weight: 800;">"Open in Chrome"</span>.
+            </p>
+        </div>
+    </div>
+
+    <div id="custom-alert-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 35000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; font-family: 'Outfit', sans-serif;">
+        <div style="background: linear-gradient(rgba(17,17,17,0.95), rgba(17,17,17,0.95)), url('assets/Sign%20in%20page.jpeg') center/cover; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.8); text-align: center;">
+            <h2 id="custom-alert-header" style="color: #FFB75E; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">ALERT</h2>
+            <p id="custom-alert-text" style="color: white; font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px;">
+                Alert message
+            </p>
+            <button id="custom-alert-ok-btn" style="width: 100%; padding: 14px; background: #38ef7d; color: black; border: none; border-radius: 6px; font-weight: 800; font-family: 'Outfit', sans-serif; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">OK</button>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <div class="form-overlay">
+            <form class="auth-container" onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <input type="email" id="username" class="stylized-input" placeholder="Email Address" autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" class="stylized-input" placeholder="Password" autocomplete="current-password">
+                    <svg id="togglePasswordIcon" class="toggle-password" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </div>
+                
+                <button type="submit" id="loginBtn" class="primary-button">LOGIN</button>
+
+                <div class="secondary-links">
+                    <a class="text-link" id="forgotPasswordBtn">Forgot Password?</a>
+                    <a class="text-link" id="registerBtn">Create Account</a>
+                    <a class="text-link" id="guestBtn">Play as Guest</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- 1. ALL IMPORTS MUST BE AT THE ABSOLUTE TOP ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, initializeAuth, browserLocalPersistence, indexedDBLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        function showCustomAlert(header, message, callback) {
+            document.getElementById('custom-alert-header').innerText = header;
+            document.getElementById('custom-alert-text').innerText = message;
+            document.getElementById('custom-alert-overlay').style.display = 'flex';
+            document.getElementById('custom-alert-ok-btn').onclick = () => {
+                document.getElementById('custom-alert-overlay').style.display = 'none';
+                if (callback) callback();
+            };
+        }
+        import { getFirestore, doc, getDoc, updateDoc, deleteDoc, deleteField, initializeFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Detect Facebook in-app browser
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        if (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1 || ua.indexOf("Instagram") > -1) {
+            document.getElementById('fb-browser-warning').style.display = 'flex';
+        }
+
+        // Service Worker Registration for caching static assets
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(err => console.error("SW failed: ", err));
+            });
+        }
+
+        // Real Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZGf-ZTiyGvLyHO8ZYxNH5FQZVkupVipc",
+            authDomain: "global-kickoff-76ae0.firebaseapp.com",
+            projectId: "global-kickoff-76ae0",
+            storageBucket: "global-kickoff-76ae0.firebasestorage.app",
+            messagingSenderId: "870153058574",
+            appId: "1:870153058574:web:48a6f3e8328b587190bf5f",
+            measurementId: "G-9FL6QM52YP"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        
+        // --- 2. CLEAN INITIALISATION (No duplicate setPersistence) ---
+        let auth;
+        try {
+            auth = initializeAuth(app, {
+                persistence: [indexedDBLocalPersistence, browserLocalPersistence]
+            });
+        } catch (e) {
+            auth = getAuth(app); // fallback if already initialised
+        }
+        
+        // Use initializeFirestore to fix Capacitor iOS hanging issue
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+        async function ensureProfileEmail(user) {
+            try {
+                const userDocRef = doc(db, 'users', user.uid);
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (!data.profile || !data.profile.email) {
+                        await updateDoc(userDocRef, {
+                            'profile.email': user.email,
+                            'economy.email': deleteField()
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error("Lazy migration error:", e);
+            }
+        }
+
+        // UI Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+        const emailInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        // Email Memory
+        const savedEmail = localStorage.getItem('gk_saved_email');
+        if (savedEmail) {
+            emailInput.value = savedEmail;
+        }
+
+        // Toggle Password Visibility
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+        
+        togglePasswordIcon.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            if (type === 'password') {
+                this.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            } else {
+                this.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            }
+        });
+
+        // Environment Check
+        const isCapacitor = window.Capacitor && window.Capacitor.isNativePlatform();
+        if (window.Capacitor && window.Capacitor.getPlatform) {
+            const platform = window.Capacitor.getPlatform();
+            if (platform === 'ios') {
+                document.body.classList.add('platform-ios');
+            } else if (platform === 'android') {
+                document.body.classList.add('platform-android');
+            }
+        }
+
+        // FAST NATIVE BYPASS: If localStorage has a player ID, they are already logged in from a previous session.
+        if (localStorage.getItem('gk_player_id')) {
+            window.location.replace('menu.html');
+        }
+
+        // --- 3. ROGUE CODE DELETED. Just listen for the state directly. ---
+        onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const isDemoAccount = user.email === 'demo1@globalkickoff.com' || user.email === 'demo2@globalkickoff.com';
+                    if (user.emailVerified || isDemoAccount) {
+                        await ensureProfileEmail(user);
+                        localStorage.setItem('gk_player_id', user.uid);
+                        window.location.replace('menu.html');
+                    } else {
+                        document.getElementById('verification-overlay').style.display = 'flex';
+                        
+                        const resendBtn = document.getElementById('resendEmailBtn');
+                        resendBtn.onclick = async () => {
+                            resendBtn.innerText = "SENDING...";
+                            resendBtn.disabled = true;
+                            try {
+                                const { sendEmailVerification } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+                                await sendEmailVerification(user);
+                                alert("Verification email sent! Please check your inbox.");
+                                resendBtn.innerText = "EMAIL SENT";
+                            } catch (e) {
+                                console.error(e);
+                                alert("Error sending email: " + e.message);
+                                resendBtn.innerText = "RESEND EMAIL";
+                                resendBtn.disabled = false;
+                            }
+                        };
+                        
+                        document.getElementById('backToLoginBtn').onclick = () => {
+                            document.getElementById('verification-overlay').style.display = 'none';
+                            const loginBtn = document.getElementById('loginBtn');
+                            if(loginBtn) {
+                                loginBtn.innerText = "LOGIN";
+                                loginBtn.disabled = false;
+                            }
+                        };
+                        
+                        auth.signOut();
+                    }
+                }
+            });
+
+        // Login Handler
+        loginBtn.addEventListener('click', () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            if (!email || !password) {
+                showCustomAlert("LOGIN ERROR", "Please enter both email and password.");
+                return;
+            }
+                
+                loginBtn.innerText = "LOGGING IN...";
+                loginBtn.disabled = true;
+
+                // Save Email
+                localStorage.setItem('gk_saved_email', email);
+                
+                signInWithEmailAndPassword(auth, email, password)
+                    .then(async (userCredential) => {
+                        const user = userCredential.user;
+                        const isDemoAccount = user.email === 'demo1@globalkickoff.com' || user.email === 'demo2@globalkickoff.com';
+                        
+                        if (user.emailVerified || isDemoAccount) {
+                            await ensureProfileEmail(user);
+                            localStorage.setItem('gk_player_id', user.uid);
+                            
+                            // Set player ID immediately so redirect doesn't generate a guest ID
+                            localStorage.setItem('gk_player_id', user.uid);
+                            
+                            // Fetching state moved to menu.html to avoid race condition
+                            window.location.href = 'menu.html';
+                        } else {
+                            document.getElementById('verification-overlay').style.display = 'flex';
+                            
+                            const resendBtn = document.getElementById('resendEmailBtn');
+                            resendBtn.onclick = async () => {
+                                resendBtn.innerText = "SENDING...";
+                                resendBtn.disabled = true;
+                                try {
+                                    const { sendEmailVerification } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+                                    await sendEmailVerification(user);
+                                    showCustomAlert("VERIFY EMAIL", "Verification email sent! Please check your inbox.");
+                                    resendBtn.innerText = "EMAIL SENT";
+                                } catch (e) {
+                                    console.error(e);
+                                    showCustomAlert("ERROR", "Error sending email: " + e.message);
+                                    resendBtn.innerText = "RESEND EMAIL";
+                                    resendBtn.disabled = false;
+                                }
+                            };
+                            
+                            document.getElementById('backToLoginBtn').onclick = () => {
+                                document.getElementById('verification-overlay').style.display = 'none';
+                                loginBtn.innerText = "LOGIN";
+                                loginBtn.disabled = false;
+                            };
+                            
+                            auth.signOut();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error.code, error.message);
+                        if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-email') {
+                            showCustomAlert("LOGIN ERROR", "Login Error, please check username or password, create an account or select play as guest.");
+                        } else {
+                            showCustomAlert("LOGIN ERROR", "Login failed: " + error.message);
+                        }
+                        loginBtn.innerText = "LOGIN";
+                        loginBtn.disabled = false;
+                    });
+        });
+
+        // Register Handler
+        registerBtn.addEventListener('click', () => {
+            window.location.href = 'register.html';
+        });
+
+        // Guest Handler
+        const guestBtn = document.getElementById('guestBtn');
+        if (guestBtn) {
+            guestBtn.addEventListener('click', () => {
+                localStorage.setItem('gk_is_guest', 'true');
+                localStorage.setItem('gk_guest_first_login', 'true');
+                localStorage.setItem('gk_player_id', 'guest_' + Math.random().toString(36).substr(2, 9));
+                window.location.href = 'menu.html';
+            });
+        }
+
+        // Forgot Password Implementation
+        forgotPasswordBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            if (!email) {
+                showCustomAlert("RESET PASSWORD", "Please enter your email address in the box first, then click Forgot Password.");
+                return;
+            }
+            
+            try {
+                const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+                await sendPasswordResetEmail(auth, email);
+                showCustomAlert("RESET PASSWORD", "Password reset link sent! Please check your email and junk folders.");
+            } catch (error) {
+                console.error(error.code, error.message);
+                if (error.code === 'auth/user-not-found') {
+                    showCustomAlert("RESET PASSWORD", "No account found with that email address.");
+                } else {
+                    showCustomAlert("RESET PASSWORD", "Error: " + error.message);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

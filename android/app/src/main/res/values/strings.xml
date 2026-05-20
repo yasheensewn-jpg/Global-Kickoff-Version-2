@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Global Kickoff</string>
+    <string name="title_activity_main">Global Kickoff</string>
+    <string name="package_name">com.finandflow.globalkickoff</string>
+    <string name="custom_url_scheme">com.finandflow.globalkickoff</string>
+</resources>

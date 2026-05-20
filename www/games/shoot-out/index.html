@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Shoot out</title>
+  <link rel="stylesheet" href="src/css/style.css">
+  
+  <!-- Preload gameplay assets to prevent pop-in -->
+  <link rel="preload" as="image" href="../../assets/shoot-out/special_ball_1.png">
+  <link rel="preload" as="image" href="../../assets/shoot-out/special_ball_2.png">
+  <link rel="preload" as="image" href="../../assets/shoot-out/soccer_clock.png">
+  <link rel="preload" as="image" href="../../assets/shoot-out/winged_money_bag.png">
+  <link rel="preload" as="image" href="../../assets/shoot-out/power_up_drink.png">
+  <link rel="stylesheet" href="../../assets/css/global-ui.css">
+</head>
+<body>
+
+  <div id="game-container">
+    <!-- Timer Bar -->
+    <div id="timer-bar-container">
+        <div id="timer-bar-fill"></div>
+    </div>
+    
+    <!-- Level Controls -->
+    <div class="level-control-panel">
+        <label for="difficulty-slider">Level: <span id="level-display">1</span></label>
+        <div class="slider-controls" style="display: flex; gap: 5px; align-items: center;">
+            <button id="level-down-btn" class="level-arrow" style="background:none;border:none;color:white;cursor:pointer;">◀</button>
+            <input type="range" id="difficulty-slider" min="1" max="20" value="1">
+            <button id="level-up-btn" class="level-arrow" style="background:none;border:none;color:white;cursor:pointer;">▶</button>
+        </div>
+    </div>
+
+    <!-- Gear Icon -->
+    <button id="sound-toggle-btn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 65px); left: 15px; font-size: 24px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); color: white; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; pointer-events: auto; z-index: 10000; display: flex; align-items: center; justify-content: center;">🔊</button>
+    <button id="open-drawer-btn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 10px); right: 10px; font-size: 24px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); color: white; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; z-index: 10000; pointer-events: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; transition: transform 0.2s;"><img src="../../assets/dribble/Soccer%20gear.png" alt="Settings" style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.4);"></button>
+    <audio id="bg-music" loop preload="none">
+        <source src="../../assets/sound/Marching Shoot out .mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Side Drawer -->
+    <div id="hub-backdrop" style="display: none;"></div>
+    <div id="side-drawer" style="position: absolute; top: 0; right: -100%; width: 70%; max-width: 350px; height: 100%; background: #222; z-index: 10000; transition: right 0.3s ease-in-out; box-shadow: -5px 0 15px rgba(0,0,0,0.5); padding: 20px; color: white; display: flex; flex-direction: column; pointer-events: auto;">
+        <button id="close-drawer-btn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 10px); right: 10px; background: none; border: none; color: #888; font-size: 20px; cursor: pointer; font-weight: bold;">X</button>
+        
+        <div style="background: #222; padding: 15px; text-align: center; border-bottom: 2px solid #00d2ff; margin-bottom: 20px; display: flex; justify-content: space-around;">
+            <div>
+                <div style="color: #888; font-size: 12px; font-weight: bold; letter-spacing: 1px;">TOTAL XP</div>
+                <div id="global-xp" style="color: #00ff00; font-size: 24px; font-weight: bold; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 5px);">0</div>
+            </div>
+            <div>
+                <div style="color: #888; font-size: 12px; font-weight: bold; letter-spacing: 1px;">TOKENS</div>
+                <div id="global-tokens" style="color: #ffd700; font-size: 24px; font-weight: bold; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 5px);">0</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 0 15px;">
+            <div style="font-weight: bold; font-family: sans-serif; margin-bottom: 5px; font-size: 1rem; color: white;">Stamina: <span id="global-stamina">500</span>/500</div>
+            <div style="width: 100%; height: 15px; background: #444; border-radius: 8px; overflow: hidden;">
+                <div id="global-stamina-bar" style="width: 100%; height: 100%; background: #38ef7d; transition: width 0.3s ease;"></div>
+            </div>
+            <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 8px); font-size: 0.75rem; color: #aaa; font-family: sans-serif; line-height: 1.3;">To keep playing recharge your stamina in the recovery hub in the locker room. Stamina also recharges daily.</div>
+        </div>
+        <!-- Unified Accordion Group -->
+        <div id="unifiedDrawerGroup" style="padding-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; overflow-y: auto; font-family: sans-serif;">
+            <details style="margin-bottom: 15px;">
+                <summary style="cursor: pointer; font-weight: bold; outline: none; color: #ffeb3b; font-size: 1rem; text-transform: uppercase;">Special Moves</summary>
+                
+                <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Romeo Rocket -->
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="font-size: 24px;">🚀</div>
+                            <div>
+                                <div style="font-weight: bold; color: #fff; font-size: 0.9rem;">Romeo Rocket</div>
+                                <div style="font-size: 0.75rem; color: #aaa;">Scrub the screen to charge an explosive blast! (Reduces opponent hit count by 2).</div>
+                            </div>
+                        </div>
+                        <button id="btn-romeo" onclick="window.purchaseItem('shootout', 'moves', 'romeo_rocket'); window.updateShootOutUI();" style="width: 100%; padding: 8px; border-radius: 4px; border: none; font-weight: bold; font-family: sans-serif; cursor: pointer; transition: background 0.2s; background: #00d2ff; color: #000;">Purchase: 100 Tokens</button>
+                    </div>
+
+                    <!-- Lightning Ball -->
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="font-size: 24px;">⚡</div>
+                            <div>
+                                <div style="font-weight: bold; color: #fff; font-size: 0.9rem;">Lightning Ball</div>
+                                <div style="font-size: 0.75rem; color: #aaa;">Tap rapidly 10 times to summon a chain-lightning strike! (Reduces 1 hit on 2 opponents at once).</div>
+                            </div>
+                        </div>
+                        <button id="btn-lightning" onclick="window.purchaseItem('shootout', 'moves', 'lightning_ball'); window.updateShootOutUI();" style="width: 100%; padding: 8px; border-radius: 4px; border: none; font-weight: bold; font-family: sans-serif; cursor: pointer; transition: background 0.2s; background: #00d2ff; color: #000;">Purchase: 100 Tokens</button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- No Special Gear for Shoot Out as per user request -->
+
+            <details style="margin-bottom: 15px;">
+                <summary style="cursor: pointer; font-weight: bold; outline: none; color: #00d2ff; font-size: 1rem; text-transform: uppercase;">Rules</summary>
+                <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 10px);">
+                    <h5 style="margin: 0 0 5px 0; color: #00d2ff; font-size: 0.85rem;">How to Play</h5>
+                    <ul style="margin-top: 0; padding-left: 20px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.4; color: rgba(255,255,255,0.8);">
+                        <li style="margin-bottom: 8px;"><b>Shoot:</b> Swipe up from the red ball toward an opponent to hit them.</li>
+                        <li style="margin-bottom: 8px;"><b>Win:</b> Knock out enough opponents to reach the point target before time runs out.</li>
+                        <li style="margin-bottom: 8px;"><b>Lose:</b> If opponents cross the red dotted line, you get a Strike. Too many strikes = Game Over!</li>
+                    </ul>
+
+                    <h5 style="margin: 0 0 5px 0; color: #38ef7d; font-size: 0.85rem;">Bonuses & Hazards</h5>
+                    <ul style="margin-top: 0; padding-left: 20px; font-size: 0.85rem; line-height: 1.4; color: rgba(255,255,255,0.8); margin-bottom: 15px;">
+                        <li style="margin-bottom: 8px;">Tap or shoot flying clocks for <b>+5 Seconds</b>.</li>
+                        <li style="margin-bottom: 8px;">Tap or shoot flying bags for <b>+50 Tokens</b>.</li>
+                        <li style="margin-bottom: 8px;">At higher levels, watch out for the <b>Headache Blur</b>! Tap the Sports Drink to cure it temporarily.</li>
+                        <li>Collect special moves to use, aim the ball at them when they appear in the sky. Need to be purchased first.</li>
+                    </ul>
+                </div>
+            </details>
+            <label style="display: flex; align-items: center; cursor: pointer; font-size: 15px; color: white; margin-bottom: 25px; padding-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); border-top: 1px solid rgba(255,255,255,0.1);">
+                <input type="checkbox" id="drawer-mute-audio" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="if(window.toggleGlobalAudio) window.toggleGlobalAudio(this.checked)"> Mute All Audio
+            </label>
+            
+            <div id="dev-options-panel" style="display: none;">
+                <details style="margin-bottom: 15px;">
+                    <summary style="cursor: pointer; font-weight: bold; outline: none; color: #38ef7d; font-size: 1rem; text-transform: uppercase;">Developer Options</summary>
+                    <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); padding-bottom: 15px;">
+                        <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 10px); font-size: 0.85rem; color: rgba(255,255,255,0.8);">
+                            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer;">
+                                <input type="checkbox" id="dev-disable-blur"> Disable Blur Effect
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer;">
+                                <input type="checkbox" id="dev-stop-timer"> Stop Timer
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer;">
+                                <input type="checkbox" id="dev-ignore-strikes"> Ignore Strikes
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer;">
+                                <input type="checkbox" id="dev-unlock-levels"> Enable All Levels
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer;">
+                                <input type="checkbox" id="dev-infinite-stamina"> Infinite Stamina
+                            </label>
+                        </div>
+                        
+                        <hr style="border: none; border-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 1px) solid rgba(255, 255, 255, 0.1); margin: 15px 0;">
+                        <h4 style="margin-top: 0; margin-bottom: 12px; color: #ffd700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Economy Cheats</h4>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button onclick="window.modifyStatByPercentage('xp', -5)" style="flex: 1; padding: 8px; background: #ff4757; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">-5% XP</button>
+                            <button onclick="window.modifyStatByPercentage('xp', 5)" style="flex: 1; padding: 8px; background: #00ff00; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+5% XP</button>
+                            <button onclick="window.addXP(2500)" style="flex: 1; padding: 8px; background: #00ff00; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+2500</button>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button onclick="window.modifyStatByPercentage('tokens', -5)" style="flex: 1; padding: 8px; background: #ff4757; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">-5% TKN</button>
+                            <button onclick="window.modifyStatByPercentage('tokens', 5)" style="flex: 1; padding: 8px; background: #ffd700; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+5% TKN</button>
+                            <button onclick="window.addTokens(2500)" style="flex: 1; padding: 8px; background: #ffd700; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+2500</button>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <button onclick="window.modifyStatByPercentage('stamina', -5)" style="flex: 1; padding: 8px; background: #ff4757; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">-5% STM</button>
+                            <button onclick="window.modifyStatByPercentage('stamina', 5)" style="flex: 1; padding: 8px; background: #38ef7d; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+5% STM</button>
+                            <button onclick="window.addStamina(200)" style="flex: 1; padding: 8px; background: #38ef7d; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+200</button>
+                        </div>
+                        
+                        <h4 style="margin-top: 0; margin-bottom: 12px; color: #ffd700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Special Move Tests</h4>
+                        <button id="dev-test-rocket" style="width: 100%; margin-bottom: 10px; padding: 8px; background: #ff5722; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">Test Romeo Rocket</button>
+                        <button id="dev-test-lightning" style="width: 100%; padding: 8px; background: #00e5ff; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">Test Lightning Ball</button>
+                    </div>
+                </details>
+            </div>
+        </div>
+        
+        <button onclick="if(window.syncToCloud) { window.syncToCloud().then(()=>alert('Progress Saved to Cloud!')).catch(()=>alert('Failed to save.')); } else { alert('Save feature not ready.'); }" style="width: 100%; padding: 12px; margin-bottom: 10px; background: #38ef7d; color: black; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; text-transform: uppercase;">Save Progress</button>
+        <button onclick="if(window.logoutUser) window.logoutUser('../../index.html'); else { localStorage.removeItem('gk_player_id'); window.location.href='../../index.html'; }" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #ff4757; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; text-transform: uppercase;">Log Out</button>
+
+        <!-- Main Menu Button -->
+        <button onclick="window.location.href='../../menu.html'" style="width: 100%; margin-bottom: 15px; padding: 12px; background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; color: #ff4757; border-radius: 6px; cursor: pointer; font-family: sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 1px; transition: all 0.2s;">
+            RETURN TO MAIN MENU
+        </button>
+        <button onclick="window.location.href='../../features/locker-room/index.html'" style="width: 100%; margin-bottom: 25px; padding: 12px; background: rgba(0, 210, 255, 0.1); border: 1px solid #00d2ff; color: #00d2ff; border-radius: 6px; cursor: pointer; font-family: sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 1px; transition: all 0.2s;">
+            RETURN TO LOCKER ROOM
+        </button>
+    </div>
+
+
+    <button class="game-back-btn" onclick="window.location.href='../../menu.html'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <div class="match-state-panel" id="score-box">
+        <div>Points: <span id="score-display">0 / 3</span></div>
+        <div style="color: #ff3c3c;">Strikes: <span id="strike-display">0 / 1</span></div>
+    </div>
+    
+    <div id="game-world" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
+        <!-- Finish Line -->
+        <div id="finish-line"></div>
+        <div id="red-ammo" class="ammo-base glow-red"></div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="game-over-overlay" class="hidden">
+      <h2 id="overlay-title"></h2>
+      <div id="overlay-image"></div>
+      <button id="overlay-btn"></button>
+    </div>
+    
+    <!-- Charge Overlay Minigame -->
+    <div id="charge-overlay" class="hidden">
+        <h2 id="charge-title"></h2>
+        <div id="charge-progress-bar"><div id="charge-progress-fill"></div></div>
+        <div id="charge-ball"></div>
+        <img id="tutorial-hand" src="../../assets/shoot-out/transparent_glove.png" class="hidden" style="position: absolute; width: 60px; pointer-events: none; z-index: 100; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));">
+    </div>
+    
+    <!-- Main Game Tutorial Overlay -->
+    <div id="main-tutorial-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; pointer-events: auto; display: flex; flex-direction: column; align-items: center;">
+        <button id="skipTutorialBtn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 20px); right: 20px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: white; padding: 8px 16px; font-family: sans-serif; font-weight: bold; cursor: pointer; z-index: 1001; transition: opacity 0.2s;">SKIP &gt;&gt;</button>
+        <h2 style="color: white; font-family: sans-serif; font-size: 1.5rem; text-align: center; margin-top: 30vh; text-shadow: 2px 2px 4px #000; padding: 0 20px;">Knock opponents away, swipe up on the ball</h2>
+        <img id="main-tutorial-glove" src="../../assets/shoot-out/transparent_glove.png" style="position: absolute; bottom: 40px; left: 50%; width: 60px; margin-left: -30px; pointer-events: none; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));">
+    </div>
+
+    <!-- Generic JIT Tutorial Overlay -->
+    <div id="tutorial-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1005; pointer-events: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; font-family: sans-serif; text-align: center;">
+        <h2 id="tutorial-title" style="color: #00e5ff; font-size: 2rem; margin-bottom: 20px; text-shadow: 2px 2px 4px #000;"></h2>
+        <div id="tutorial-text" style="color: white; font-size: 1.2rem; line-height: 1.5; margin-bottom: 40px; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;"></div>
+        <button id="tutorial-btn" style="padding: 15px 40px; font-size: 1.2rem; background: #00e5ff; color: #000; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,229,255,0.5);">Got it!</button>
+    </div>
+  </div>
+
+    <div id="gameCountdownOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100000; display: none; flex-direction: column; justify-content: center; align-items: center;">
+        <div id="gameCountdownText" style="font-size: 150px; font-weight: 800; color: #fff; text-shadow: 0 0 30px #00d2ff; font-family: 'Impact', sans-serif;">3</div>
+        <button id="countdownRulesBtn" style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 50px); padding: 15px 30px; font-size: 20px; font-weight: bold; background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">GO TO RULES</button>
+        <button id="skipCountdownBtn" style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 20px); background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: white; padding: 8px 16px; font-family: sans-serif; font-weight: bold; cursor: pointer; z-index: 100001; transition: opacity 0.2s;">SKIP &gt;&gt;</button>
+    </div>
+
+    <script src="../../services/gameState.js?v=2"></script>
+    <script src="src/js/game.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bgMusic = document.getElementById('bg-music');
+            const soundBtn = document.getElementById('sound-toggle-btn');
+            const drawerMute = document.getElementById('drawer-mute-audio');
+            
+            const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+            if(bgMusic) bgMusic.muted = isMuted;
+            if(soundBtn) soundBtn.innerText = isMuted ? '🔇' : '🔊';
+            if(drawerMute) drawerMute.checked = isMuted;
+
+
+            
+            if(soundBtn) {
+                soundBtn.addEventListener('click', () => {
+                    if (bgMusic.muted) {
+                        bgMusic.muted = false;
+                        soundBtn.innerText = '🔊';
+                        localStorage.setItem('gk_audio_muted', 'false');
+                        if(drawerMute) drawerMute.checked = false;
+                        bgMusic.play().catch(e => console.log(e));
+                    } else {
+                        bgMusic.muted = true;
+                        soundBtn.innerText = '🔇';
+                        localStorage.setItem('gk_audio_muted', 'true');
+                        if(drawerMute) drawerMute.checked = true;
+                    }
+                });
+            }
+
+            window.toggleGlobalAudio = function(isMuted) {
+                if(bgMusic) bgMusic.muted = isMuted;
+                if(soundBtn) soundBtn.innerText = isMuted ? '🔇' : '🔊';
+                localStorage.setItem('gk_audio_muted', isMuted ? 'true' : 'false');
+                if(!isMuted && bgMusic) bgMusic.play().catch(e => console.log(e));
+            };
+        });
+
+        const unlockAudio = () => {
+            const bgMusic = document.getElementById('bg-music');
+            const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+            
+            if (bgMusic && bgMusic.paused && !isMuted) {
+                let playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        ['click', 'touchstart', 'touchend'].forEach(evt => document.body.removeEventListener(evt, unlockAudio));
+                    }).catch(e => {
+                        console.log('Browser requires stronger interaction to unlock audio:', e);
+                    });
+                }
+            }
+        };
+
+        ['click', 'touchstart', 'touchend'].forEach(evt => {
+            document.body.addEventListener(evt, unlockAudio, { passive: true });
+        });
+    
+        // Pause audio when app is minimized/tab is switched
+        document.addEventListener("visibilitychange", function() {
+            const bgMusic = document.getElementById('bg-music');
+            if (!bgMusic) return;
+            
+            if (document.hidden) {
+                bgMusic.pause();
+            } else {
+                const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+                if (!isMuted) {
+                    bgMusic.play().catch(e => console.log('Resume playback failed:', e));
+                }
+            }
+        });
+</script>
+</body>
+</html>

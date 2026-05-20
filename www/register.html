@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Global Kickoff - Register</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Outfit', sans-serif;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+
+        #app-container {
+            width: 100%;
+            height: 100vh;
+            max-width: 450px;
+            position: relative;
+            overflow: hidden;
+            background-image: url('assets/Sign%20in%20page.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-overlay {
+            position: absolute;
+            bottom: 5%;
+            left: 0;
+            width: 100%;
+            height: 65%; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 2;
+        }
+
+        .auth-container {
+            width: 80%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px;
+        }
+
+        .input-group {
+            width: 100%;
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+        }
+
+        #password {
+            padding-right: 45px;
+        }
+
+        .stylized-input {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 25px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.85);
+            color: #111111;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .stylized-input::placeholder {
+            color: rgba(0, 0, 0, 0.6);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .stylized-input:focus {
+            border-color: #FFB75E;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 15px rgba(255, 183, 94, 0.6);
+        }
+
+        .primary-button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(180deg, #FFB75E 0%, #ED8F03 100%);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #C96E00, 0 10px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+            margin-top: 5px;
+        }
+
+        .primary-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #C96E00, 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .secondary-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .text-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            cursor: pointer;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            transition: color 0.2s;
+        }
+
+        .text-link:hover {
+            color: #FFB75E;
+        }
+        
+        @media (max-width: 480px) {
+            #app-container {
+                max-width: 100%;
+                border-radius: 0;
+            }
+        }
+
+        @media (min-height: 800px) {
+            .form-overlay {
+                height: 70%;
+                bottom: 15%;
+            }
+        }
+        
+        #fb-browser-warning {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('assets/Sign%20in%20page.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            z-index: 999999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="email-exists-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+        <div style="background: #222; padding: 30px; border-radius: 20px; border: 1px solid #444; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <h1 style="color: #ff4757; font-size: 1.5rem; margin-bottom: 15px; font-weight: 800; text-transform: uppercase;">Email Already Registered</h1>
+            <p style="color: #ddd; font-size: 1rem; line-height: 1.5; margin-bottom: 25px;">This email is already linked to an account. Please return to the login screen.</p>
+            <button id="emailExistsOkBtn" class="primary-button" style="background: #444; box-shadow: 0 6px 0 #222;">OK</button>
+        </div>
+    </div>
+
+    <div id="success-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+        <div style="background: #222; padding: 30px; border-radius: 20px; border: 1px solid #444; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <h1 style="color: #39ff14; font-size: 1.5rem; margin-bottom: 15px; font-weight: 800; text-transform: uppercase;">Success!</h1>
+            <p id="successMessage" style="color: #ddd; font-size: 1rem; line-height: 1.5; margin-bottom: 25px;"></p>
+            <button id="successOkBtn" class="primary-button" style="background: #444; box-shadow: 0 6px 0 #222;">OK</button>
+        </div>
+    </div>
+
+    <div id="fb-browser-warning">
+        <div style="background: rgba(0,0,0,0.85); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h1 style="font-weight: 800; font-size: 1.6rem; margin-bottom: 15px; color: #FFB75E; text-transform: uppercase; letter-spacing: 1px;">For the best experience...</h1>
+            <p style="font-size: 1.05rem; font-weight: 400; line-height: 1.5; margin-bottom: 25px; color: #ddd;">
+                You are currently viewing this inside an in-app browser, which may prevent the game's audio and features from working correctly.
+            </p>
+            <p style="font-size: 1.1rem; font-weight: 600; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                Please tap the <span style="font-size: 1.5rem; vertical-align: middle;">•••</span> menu in the top right corner and select <br><br><span style="color: #FFB75E; font-weight: 800;">"Open in Safari"</span> or <span style="color: #FFB75E; font-weight: 800;">"Open in Chrome"</span>.
+            </p>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <div class="form-overlay">
+            <div class="auth-container">
+                <div class="input-group">
+                    <input type="email" id="email" class="stylized-input" placeholder="Email Address">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" class="stylized-input" placeholder="Password">
+                    <svg id="togglePasswordIcon" class="toggle-password" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="dob" class="stylized-input" placeholder="DOB (DD/MM/YYYY) (Optional)">
+                </div>
+                <div class="input-group">
+                    <select id="gender" class="stylized-input" style="color: rgba(0,0,0,0.6);" onchange="this.style.color='#111'">
+                        <option value="" disabled selected>Gender (Optional)</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="country" list="countriesList" class="stylized-input" placeholder="Type to search country... (Optional)">
+                    <datalist id="countriesList"></datalist>
+                </div>
+                
+                <button id="registerBtn" class="primary-button">REGISTER</button>
+
+                <div class="secondary-links">
+                    <a href="index.html" class="text-link">BACK TO LOGIN</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const allCountries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czechia","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Detect Facebook in-app browser
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            if (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1 || ua.indexOf("Instagram") > -1) {
+                document.getElementById('fb-browser-warning').style.display = 'flex';
+            }
+
+            const dl = document.getElementById('countriesList');
+            if(dl) {
+                allCountries.forEach(c => {
+                    let opt = document.createElement('option');
+                    opt.value = c;
+                    dl.appendChild(opt);
+                });
+            }
+        });
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, initializeAuth, browserLocalPersistence, indexedDBLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, initializeFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Real Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZGf-ZTiyGvLyHO8ZYxNH5FQZVkupVipc",
+            authDomain: "global-kickoff-76ae0.firebaseapp.com",
+            projectId: "global-kickoff-76ae0",
+            storageBucket: "global-kickoff-76ae0.firebasestorage.app",
+            messagingSenderId: "870153058574",
+            appId: "1:870153058574:web:48a6f3e8328b587190bf5f",
+            measurementId: "G-9FL6QM52YP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        
+        let auth;
+        try {
+            auth = initializeAuth(app, {
+                persistence: [indexedDBLocalPersistence, browserLocalPersistence]
+            });
+        } catch (e) {
+            auth = getAuth(app); // fallback
+        }
+        
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+        const registerBtn = document.getElementById('registerBtn');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        // Toggle Password Visibility
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+        
+        togglePasswordIcon.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            if (type === 'password') {
+                this.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            } else {
+                this.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            }
+        });
+
+        registerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const dobEl = document.querySelector('.auth-container #dob');
+            const genderEl = document.querySelector('.auth-container #gender');
+            const countryEl = document.querySelector('.auth-container #country');
+            
+            if (!dobEl || !genderEl || !countryEl) {
+                console.error("DOM Error: Could not find strictly scoped registration inputs (.auth-container).");
+            }
+            
+            const dob = dobEl ? dobEl.value.trim() : '';
+            const gender = genderEl ? genderEl.value.trim() : '';
+            const country = countryEl ? countryEl.value.trim() : '';
+            
+            if (!email || !password) {
+                alert("Please enter both email and password to register.");
+                return;
+            }
+            
+            registerBtn.innerText = "CREATING...";
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(async (userCredential) => {
+                    const user = userCredential.user;
+                    localStorage.setItem('gk_user_profile', JSON.stringify({ dob, gender, country, email: user.email }));
+                    
+                    try {
+                        await setDoc(doc(db, "users", user.uid), {
+                            hasSeenDemoPrompt: false,
+                            notifications: { seenShootOutUnlock: false },
+                            profile: { 
+                                dob, 
+                                gender, 
+                                country,
+                                email: user.email 
+                            }
+                        }, { merge: true });
+                    } catch(e) {
+                        console.error("Error setting initial user doc:", e);
+                    }
+
+                    sendEmailVerification(user).then(() => {
+                        const successOverlay = document.getElementById('success-overlay');
+                        const successMsg = document.getElementById('successMessage');
+                        const successOkBtn = document.getElementById('successOkBtn');
+                        
+                        successMsg.innerHTML = `Account created successfully! A verification email has been sent to <strong>${email}</strong>. <br><br><b>Please check your junk mail/spam folder.</b>`;
+                        successOverlay.style.display = 'flex';
+                        
+                        successOkBtn.onclick = () => {
+                            window.location.href = 'index.html';
+                        };
+                    });
+                })
+                .catch((error) => {
+                    console.error(error.code, error.message);
+                    if (error.code === 'auth/email-already-in-use') {
+                        document.getElementById('email-exists-overlay').style.display = 'flex';
+                        document.getElementById('emailExistsOkBtn').onclick = () => {
+                            document.getElementById('email-exists-overlay').style.display = 'none';
+                        };
+                    } else {
+                        alert("Registration failed: " + error.message + "\n\nNote: You may need to manually enable Email/Password Authentication in the Firebase Console under Authentication -> Sign-in method.");
+                    }
+                    registerBtn.innerText = "REGISTER";
+                });
+        });
+    </script>
+</body>
+</html>

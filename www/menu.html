@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Global Kickoff</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #app-container {
+            width: 100%;
+            min-height: 100dvh;
+            max-width: 430px;
+            background-image: url('assets/Global Kickoff landing page.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .menu-overlay {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.15); /* reduced dimming for contrast */
+        }
+
+        .menu-header {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .menu-header h1 {
+            color: #ffffff;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            font-size: 2.8rem;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 255, 0.3);
+            margin: 0;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .menu-buttons button {
+            background: linear-gradient(135deg, rgba(255, 153, 0, 0.8), rgba(255, 85, 0, 0.8));
+            backdrop-filter: blur(4px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.1s ease-in-out;
+            font-family: 'Arial', sans-serif;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-buttons button.btn-locker, .menu-buttons button.btn-recovery {
+            background: linear-gradient(135deg, rgba(28, 181, 224, 0.8), rgba(0, 0, 70, 0.8));
+        }
+        
+        .menu-buttons button.btn-locker {
+            margin-top: 10px;
+        }
+
+        .menu-buttons button:active {
+            transform: translateY(3px) scale(0.97);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes spinGear {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .is-spinning {
+            animation: spinGear 0.5s ease-in-out;
+        }
+
+        @media (max-width: 430px) {
+            #app-container {
+                max-width: 100%;
+                min-height: 100dvh;
+
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <div class="menu-overlay">
+            <div class="menu-header">
+                <!-- Logo baked into background -->
+            </div>
+            <div class="menu-buttons">
+                <h2 style="color: rgba(255,255,255,0.9); text-align: center; font-family: sans-serif; text-transform: uppercase; letter-spacing: 4px; font-size: 1rem; margin-top: 0; margin-bottom: 15px; padding: 8px 20px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; align-self: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">MENU</h2>
+                <button onclick="window.location.href='games/crossbar-challenge/index.html'">Crossbar Challenge</button>
+                <button onclick="window.location.href='games/dribble-slalom/index.html'">Dribble Slalom</button>
+                <button id="btnShootOut" onclick="handleShootOutClick()">Shoot Out</button>
+                <button class="btn-locker" onclick="window.location.href='features/locker-room/index.html'">Locker Room</button>
+                <button class="btn-recovery" onclick="window.location.href='features/locker-room/index.html?action=recovery'">Stamina Regeneration</button>
+                <button onclick="performLogOut()" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; padding: 10px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); box-shadow: none; cursor: pointer;">Log Out</button>
+            </div>
+        </div>
+        <button id="sound-toggle-btn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 20px); left: 20px; z-index: 10000; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white;">
+            🔊
+        </button>
+        <audio id="bg-music" loop preload="none">
+            <source src="assets/sound/Before_the_Roar.mp3" type="audio/mpeg">
+        </audio>
+        <div style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); right: 15px; display: flex; flex-direction: column; align-items: center; z-index: 10000;">
+            <button id="menu-dev-btn" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; pointer-events: auto; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
+                <img src="assets/dribble/Soccer%20gear.png" style="width: 36px; height: 36px; object-fit: contain; pointer-events: none; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.4);">
+            </button>
+            <span style="color: rgba(255,255,255,0.7); font-size: 9px; font-family: sans-serif; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); text-align: center; line-height: 1;">Settings</span>
+        </div>
+        
+        <!-- Dev Drawer Overlay -->
+        <div id="menu-dev-backdrop" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 15000; display: none;" onclick="closeMenuDevDrawer()"></div>
+        
+        <!-- Dev Drawer -->
+        <div id="menu-dev-drawer" style="position: absolute; top: 0; right: -100%; width: 75%; max-width: 350px; height: 100%; background: linear-gradient(rgba(17,17,17,0.85), rgba(17,17,17,0.85)), url('assets/Sign%20in%20page.jpeg') center/cover no-repeat; z-index: 20000; transition: right 0.3s ease-in-out; padding: 20px; color: white; display: flex; flex-direction: column; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.5); font-family: 'Outfit', sans-serif;">
+            <button onclick="closeMenuDevDrawer()" style="align-self: flex-end; background: none; border: none; color: #888; font-size: 20px; cursor: pointer; font-weight: bold; margin-bottom: 20px;">X</button>
+            
+            <h3 style="color: #FFB75E; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; font-size: 1.1rem;">Account Settings</h3>
+            <div id="account-settings-content" style="margin-bottom: 25px; font-size: 15px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="color: #ccc; font-weight: 600;">Email: <span id="settings-email" style="color: white; font-weight: 800; word-break: break-all;">Loading...</span></div>
+                <div>
+                    <label style="color: #ccc; display: block; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px;">DOB</label>
+                    <input type="date" id="settings-dob" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 6px; padding: 8px; width: 100%; box-sizing: border-box; font-family: 'Outfit', sans-serif; font-size: 1rem;">
+                </div>
+                <div>
+                    <label style="color: #ccc; display: block; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px;">Gender</label>
+                    <select id="settings-gender" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 6px; padding: 8px; width: 100%; box-sizing: border-box; appearance: auto; font-family: 'Outfit', sans-serif; font-size: 1rem;">
+                        <option value="" style="color: black;">Select Gender</option>
+                        <option value="M" style="color: black;">Male</option>
+                        <option value="F" style="color: black;">Female</option>
+                        <option value="Other" style="color: black;">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="color: #ccc; display: block; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px;">Country</label>
+                    <input type="text" id="settings-country" list="countriesList" placeholder="Type to search..." style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 6px; padding: 8px; width: 100%; box-sizing: border-box; font-family: 'Outfit', sans-serif; font-size: 1rem;">
+                    <datalist id="countriesList"></datalist>
+                </div>
+                <button id="profile-action-btn" onclick="toggleProfileMode()" style="padding: 10px; background: #38ef7d; color: black; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Edit Profile</button>
+                <button onclick="window.location.href='privacy-policy.html'" style="padding: 10px; background: #6c5ce7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Privacy Policy</button>
+                <button onclick="deleteAccount()" style="padding: 10px; background: #ff4757; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Delete Account</button>
+            </div>
+
+            <h3 style="color: #00d2ff; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; font-size: 1.1rem; font-weight: 800;">Settings</h3>
+            <label style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer; font-size: 15px; color: white; font-weight: 600;">
+                <input type="checkbox" id="drawer-mute-audio" style="margin-right: 10px; width: 18px; height: 18px;" onchange="toggleGlobalAudio(this.checked)"> 
+                Mute All Audio
+            </label>
+            <div id="dev-options-panel" style="display: none;">
+                <h3 style="color: #ffd700; text-transform: uppercase; margin-bottom: 20px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 20px); letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; font-size: 1.1rem; font-weight: 800;">Developer Options</h3>
+                
+                <label style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer; font-size: 15px; color: white; font-weight: 600;">
+                    <input type="checkbox" id="dev-enable-all" style="margin-right: 10px; width: 18px; height: 18px;"> 
+                    Enable all developer options
+                </label>
+                <label style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer; font-size: 15px; color: white; font-weight: 600;">
+                    <input type="checkbox" id="dev-disable-countdowns" style="margin-right: 10px; width: 18px; height: 18px;"> 
+                    Disable Game Countdowns
+                </label>
+                <label style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer; font-size: 15px; color: white; font-weight: 600;">
+                    <input type="checkbox" id="dev-unlock-all-games" style="margin-right: 10px; width: 18px; height: 18px;"> 
+                    Unlock all games
+                </label>
+                <label style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer; font-size: 15px; color: white; font-weight: 600;">
+                    <input type="checkbox" id="dev-infinite-stamina-menu" style="margin-right: 10px; width: 18px; height: 18px;"> 
+                    Enable Infinite Stamina
+                </label>
+            </div>
+            <button onclick="if(window.syncToCloud) { window.syncToCloud().then(()=>alert('Progress Saved to Cloud!')).catch(()=>alert('Failed to save.')); } else { alert('Save feature not ready.'); }" style="margin-top: auto; margin-bottom: 10px; padding: 12px; background: #38ef7d; color: black; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; text-transform: uppercase;">Save Progress</button>
+            <button onclick="performLogOut()" style="padding: 12px; background: #ff4757; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; text-transform: uppercase;">Log Out</button>
+        </div>
+    </div>
+    
+    <!-- Unlock Overlay -->
+    <div id="unlock-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 30000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+        <h1 style="color: #ffd700; text-transform: uppercase; margin-bottom: 10px; text-shadow: 2px 2px 5px #000;">Congratulations!</h1>
+        <p style="color: white; font-size: 1.2rem; margin-bottom: 20px;">You have unlocked the Shoot Out game!</p>
+        <img id="unlock-avatar-img" src="assets/locker-room/images/avatars/jump.png" style="width: 200px; height: auto; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));">
+        <button onclick="document.getElementById('unlock-overlay').style.display='none';" style="background: #38ef7d; color: black; font-weight: bold; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">Awesome</button>
+    </div>
+
+    <!-- Profile Completion Popup -->
+    <div id="profile-popup-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 25000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; font-family: 'Outfit', sans-serif;">
+        <div style="background: linear-gradient(rgba(17,17,17,0.95), rgba(17,17,17,0.95)), url('assets/Sign%20in%20page.jpeg') center/cover; padding: 25px; border-radius: 12px; width: 90%; max-width: 350px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.8);">
+            <h3 style="color: #FFB75E; text-transform: uppercase; margin-bottom: 5px; text-align: center; letter-spacing: 1px;">Complete Profile</h3>
+            <p style="color: #aaa; font-size: 0.85rem; text-align: center; margin-bottom: 20px;">(Optional) We use this for analytical purposes.</p>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="color: #ccc; display: block; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.8rem;">DOB</label>
+                <input type="date" id="popup-dob" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 6px; padding: 10px; width: 100%; box-sizing: border-box; font-family: 'Outfit', sans-serif;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="color: #ccc; display: block; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.8rem;">Gender</label>
+                <select id="popup-gender" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 6px; padding: 10px; width: 100%; box-sizing: border-box; font-family: 'Outfit', sans-serif;">
+                    <option value="" style="color: black;">Select</option>
+                    <option value="M" style="color: black;">Male</option>
+                    <option value="F" style="color: black;">Female</option>
+                    <option value="Other" style="color: black;">Other</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 25px;">
+                <label style="color: #ccc; display: block; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.8rem;">Country</label>
+                <input type="text" id="popup-country" list="countriesList" placeholder="Type to search..." style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 6px; padding: 10px; width: 100%; box-sizing: border-box; font-family: 'Outfit', sans-serif;">
+            </div>
+            <button onclick="savePopupProfile()" style="width: 100%; padding: 12px; background: #38ef7d; color: black; border: none; border-radius: 6px; font-weight: bold; font-family: 'Outfit', sans-serif; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Save & Continue</button>
+            <button onclick="skipPopupProfile()" style="width: 100%; padding: 12px; background: transparent; color: #aaa; border: none; font-weight: bold; font-family: 'Outfit', sans-serif; cursor: pointer; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 5px); text-transform: uppercase;">Skip</button>
+        </div>
+    </div>
+    
+    <!-- Guest Warning Modal -->
+    <div id="guest-warning-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 35000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; font-family: 'Outfit', sans-serif;">
+        <div style="background: linear-gradient(rgba(17,17,17,0.95), rgba(17,17,17,0.95)), url('assets/Sign%20in%20page.jpeg') center/cover; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.8); text-align: center;">
+            <h2 style="color: #FFB75E; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Guest Mode</h2>
+            <p style="color: white; font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px;">
+                Welcome to Global Kickoff! You are currently playing as a guest. This means your game progress, tokens, and stamina are only saved locally on this device. If you delete the game or switch to a new phone, your data will be permanently lost. To save your progress securely in the cloud, you can create an account at any time.
+            </p>
+            <button onclick="dismissGuestWarning()" style="width: 100%; padding: 14px; background: #38ef7d; color: black; border: none; border-radius: 6px; font-weight: 800; font-family: 'Outfit', sans-serif; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Understood</button>
+        </div>
+    </div>
+    
+    <div id="custom-alert-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 35000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; font-family: 'Outfit', sans-serif;">
+        <div style="background: linear-gradient(rgba(17,17,17,0.95), rgba(17,17,17,0.95)), url('assets/Sign%20in%20page.jpeg') center/cover; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.8); text-align: center;">
+            <h2 id="custom-alert-header" style="color: #FFB75E; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">ALERT</h2>
+            <p id="custom-alert-text" style="color: white; font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px;">
+                Alert message
+            </p>
+            <button id="custom-alert-ok-btn" style="width: 100%; padding: 14px; background: #38ef7d; color: black; border: none; border-radius: 6px; font-weight: 800; font-family: 'Outfit', sans-serif; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">OK</button>
+        </div>
+    </div>
+
+    <div id="custom-confirm-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 35000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; font-family: 'Outfit', sans-serif;">
+        <div style="background: linear-gradient(rgba(17,17,17,0.95), rgba(17,17,17,0.95)), url('assets/Sign%20in%20page.jpeg') center/cover; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.8); text-align: center;">
+            <h2 id="custom-confirm-header" style="color: #FFB75E; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">CONFIRM</h2>
+            <p id="custom-confirm-text" style="color: white; font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px;">
+                Are you sure?
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button id="custom-confirm-cancel-btn" style="width: 100%; padding: 14px; background: #555; color: white; border: none; border-radius: 6px; font-weight: 800; font-family: 'Outfit', sans-serif; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Cancel</button>
+                <button id="custom-confirm-ok-btn" style="width: 100%; padding: 14px; background: #ff3c3c; color: white; border: none; border-radius: 6px; font-weight: 800; font-family: 'Outfit', sans-serif; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showCustomAlert(header, message, callback) {
+            document.getElementById('custom-alert-header').innerText = header;
+            document.getElementById('custom-alert-text').innerText = message;
+            document.getElementById('custom-alert-overlay').style.display = 'flex';
+            document.getElementById('custom-alert-ok-btn').onclick = () => {
+                document.getElementById('custom-alert-overlay').style.display = 'none';
+                if (callback) callback();
+            };
+        }
+
+        function showCustomConfirm(header, message, onConfirm) {
+            document.getElementById('custom-confirm-header').innerText = header;
+            document.getElementById('custom-confirm-text').innerText = message;
+            document.getElementById('custom-confirm-overlay').style.display = 'flex';
+            document.getElementById('custom-confirm-cancel-btn').onclick = () => {
+                document.getElementById('custom-confirm-overlay').style.display = 'none';
+            };
+            document.getElementById('custom-confirm-ok-btn').onclick = () => {
+                document.getElementById('custom-confirm-overlay').style.display = 'none';
+                if (onConfirm) onConfirm();
+            };
+        }
+        function dismissGuestWarning() {
+            document.getElementById('guest-warning-overlay').style.display = 'none';
+        }
+
+        function performLogOut() {
+            localStorage.removeItem('gk_player_id');
+            localStorage.removeItem('gk_state_v3');
+            localStorage.removeItem('gk_state');
+            localStorage.removeItem('gk_user_profile');
+            localStorage.removeItem('gk_user_profile_skipped');
+            localStorage.removeItem('gk_equipped_outfit');
+            
+            const isGuest = localStorage.getItem('gk_is_guest') === 'true';
+            localStorage.removeItem('gk_is_guest');
+
+            if (!isGuest && window.GK_FirebaseAuth && window.GK_FirebaseAuth.currentUser) {
+                try {
+                    import('https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js').then(module => {
+                        module.signOut(window.GK_FirebaseAuth).then(() => {
+                            window.location.href = 'index.html';
+                        }).catch(() => {
+                            window.location.href = 'index.html';
+                        });
+                    }).catch(() => {
+                        window.location.href = 'index.html';
+                    });
+                } catch(e) {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        const allCountries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czechia","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('gk_is_guest') === 'true' && localStorage.getItem('gk_guest_first_login') === 'true') {
+                document.getElementById('guest-warning-overlay').style.display = 'flex';
+                localStorage.removeItem('gk_guest_first_login');
+            }
+
+            const dl = document.getElementById('countriesList');
+            if(dl) {
+                allCountries.forEach(c => {
+                    let opt = document.createElement('option');
+                    opt.value = c;
+                    dl.appendChild(opt);
+                });
+            }
+        });
+
+        function closeMenuDevDrawer() {
+            document.getElementById('menu-dev-drawer').style.right = '-100%';
+            setTimeout(() => { document.getElementById('menu-dev-backdrop').style.display = 'none'; }, 300);
+        }
+
+        let profileEditMode = false;
+
+        function setProfileInputsDisabled(disabled) {
+            document.getElementById('settings-dob').disabled = disabled;
+            document.getElementById('settings-gender').disabled = disabled;
+            document.getElementById('settings-country').disabled = disabled;
+            
+            const opacity = disabled ? '0.6' : '1';
+            document.getElementById('settings-dob').style.opacity = opacity;
+            document.getElementById('settings-gender').style.opacity = opacity;
+            document.getElementById('settings-country').style.opacity = opacity;
+        }
+
+        async function loadAccountSettings() {
+            let email = 'Unknown';
+            let profileObj = null;
+
+            if (window.GK_FirebaseAuth && window.GK_FirebaseAuth.currentUser && window.GK_FirebaseDB) {
+                const user = window.GK_FirebaseAuth.currentUser;
+                email = user.email || 'Unknown';
+                try {
+                    const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js");
+                    const { doc, db } = window.GK_FirebaseDB;
+                    const docSnap = await getDoc(doc(db, 'users', user.uid));
+                    if (docSnap.exists()) {
+                        const payload = docSnap.data();
+                        profileObj = payload.profile;
+                        
+                        // Hydrate outfit and avatar state from Firestore
+                        if (payload.player && payload.player.equippedOutfitId) {
+                            if (!window.GK_State) window.GK_State = { player: {}, catalogues: { outfits: {} } };
+                            if (!window.GK_State.player) window.GK_State.player = {};
+                            window.GK_State.player.equippedOutfitId = payload.player.equippedOutfitId;
+                            localStorage.setItem('gk_equipped_outfit', payload.player.equippedOutfitId);
+                        }
+                        
+                        if (payload.catalogues && payload.catalogues.outfits) {
+                            if (!window.GK_State) window.GK_State = { player: {}, catalogues: { outfits: {} } };
+                            if (!window.GK_State.catalogues) window.GK_State.catalogues = { outfits: {} };
+                            if (!window.GK_State.catalogues.outfits) window.GK_State.catalogues.outfits = {};
+                            
+                            for (const outfitId in payload.catalogues.outfits) {
+                                if (!window.GK_State.catalogues.outfits[outfitId]) {
+                                    window.GK_State.catalogues.outfits[outfitId] = {};
+                                }
+                                window.GK_State.catalogues.outfits[outfitId].owned = payload.catalogues.outfits[outfitId].owned;
+                            }
+                        }
+                        
+                        if (typeof checkOverlayLogic === 'function') checkOverlayLogic();
+                        if (typeof updateAvatarUI === 'function') updateAvatarUI();
+                        if (typeof renderCharacter === 'function') renderCharacter();
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch profile from Firestore:", e);
+                }
+            }
+
+            // Fallback to local state if Firestore fetch fails or hasn't loaded
+            if (!profileObj) {
+                if (window.GK_State && window.GK_State.profile) {
+                    profileObj = window.GK_State.profile;
+                } else {
+                    const profileStr = localStorage.getItem('gk_user_profile');
+                    if (profileStr) {
+                        try { profileObj = JSON.parse(profileStr); } catch(e) {}
+                    }
+                }
+            }
+            
+            const emailSpan = document.getElementById('settings-email');
+            emailSpan.innerText = email;
+
+            if (profileObj) {
+                let formattedDob = '';
+                if (profileObj.dob) {
+                    let dobStr = profileObj.dob.trim();
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(dobStr)) {
+                        formattedDob = dobStr;
+                    } else if (/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/.test(dobStr)) {
+                        const [, d, m, y] = dobStr.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
+                        formattedDob = `${y}-${m}-${d}`;
+                    } else if (/^(\d{2})(\d{2})(\d{4})$/.test(dobStr)) {
+                        const [, d, m, y] = dobStr.match(/^(\d{2})(\d{2})(\d{4})$/);
+                        formattedDob = `${y}-${m}-${d}`;
+                    } else {
+                        formattedDob = dobStr;
+                    }
+                }
+
+                document.getElementById('settings-dob').value = formattedDob;
+                document.getElementById('settings-gender').value = profileObj.gender || '';
+                document.getElementById('settings-country').value = profileObj.country || '';
+                
+                profileEditMode = false;
+                document.getElementById('profile-action-btn').innerText = "Edit Profile";
+                document.getElementById('profile-action-btn').style.background = "#FFB75E";
+                setProfileInputsDisabled(true);
+            } else {
+                document.getElementById('settings-dob').value = '';
+                document.getElementById('settings-gender').value = '';
+                document.getElementById('settings-country').value = '';
+
+                profileEditMode = true;
+                document.getElementById('profile-action-btn').innerText = "Save Profile";
+                document.getElementById('profile-action-btn').style.background = "#38ef7d";
+                setProfileInputsDisabled(false);
+            }
+        }
+
+        function toggleProfileMode() {
+            if (profileEditMode) {
+                // Save it
+                const dob = document.getElementById('settings-dob').value;
+                const gender = document.getElementById('settings-gender').value;
+                const country = document.getElementById('settings-country').value;
+                
+                const profile = { dob, gender, country };
+                if (window.GK_State && window.GK_State.profile && window.GK_State.profile.email) {
+                    profile.email = window.GK_State.profile.email;
+                }
+                localStorage.setItem('gk_user_profile', JSON.stringify(profile));
+                
+                if (window.GK_State) {
+                    window.GK_State.profile = profile;
+                    if (window.saveGameState) window.saveGameState();
+                    if (window.syncToCloud) window.syncToCloud();
+                }
+                profileEditMode = false;
+                document.getElementById('profile-action-btn').innerText = "Edit Profile";
+                document.getElementById('profile-action-btn').style.background = "#FFB75E";
+                setProfileInputsDisabled(true);
+            } else {
+                // Edit it
+                profileEditMode = true;
+                document.getElementById('profile-action-btn').innerText = "Save Profile";
+                document.getElementById('profile-action-btn').style.background = "#38ef7d";
+                setProfileInputsDisabled(false);
+            }
+        }
+
+        async function deleteAccount() {
+            showCustomConfirm("DELETE ACCOUNT", "Are you sure? All your progress will be lost.", async () => {
+                try {
+                    const user = window.GK_FirebaseAuth ? window.GK_FirebaseAuth.currentUser : null;
+                    if (!user) {
+                        showCustomAlert("ERROR", "You must be logged in to delete your account.");
+                        return;
+                    }
+                    
+                    const uid = user.uid;
+                    
+                    // Wipe local memory first to prevent hydration race conditions
+                    localStorage.removeItem('gk_player_id');
+                    localStorage.removeItem('gk_state_v3');
+                    localStorage.removeItem('gk_user_profile');
+                    localStorage.removeItem('gk_user_profile_skipped');
+                    localStorage.removeItem('gk_equipped_outfit');
+                    
+                    // Delete data from Firestore
+                    if (window.GK_FirebaseDB) {
+                        console.log("Executing Firestore deletion...");
+                        const { db, doc, deleteDoc } = window.GK_FirebaseDB;
+                        await deleteDoc(doc(db, "users", uid, "gameData", "gameState"));
+                        await deleteDoc(doc(db, "users", uid));
+                        console.log("Firestore wiped successfully.");
+                    }
+                    
+                    // Delete the auth user
+                    if (window.GK_FirebaseDeleteUser) {
+                        await window.GK_FirebaseDeleteUser(user);
+                    }
+                    
+                    showCustomAlert("DELETE ACCOUNT", "Account successfully deleted.", () => {
+                        window.location.href = 'index.html';
+                    });
+                } catch (error) {
+                    console.error("Error deleting account:", error);
+                    if (error.code === 'auth/requires-recent-login') {
+                        showCustomAlert("DELETE ACCOUNT", "For security reasons, please log out and log back in before deleting your account.");
+                    } else {
+                        showCustomAlert("DELETE ACCOUNT", "Error deleting account: " + error.message);
+                    }
+                }
+            });
+        }
+
+        document.getElementById('menu-dev-btn').onclick = () => {
+            loadAccountSettings();
+            document.getElementById('menu-dev-drawer').style.right = '0';
+            document.getElementById('menu-dev-backdrop').style.display = 'block';
+        };
+
+        function getPlayerXP() {
+            if (window.GK_State && window.GK_State.economy) return window.GK_State.economy.xp || 0;
+            const saved = JSON.parse(localStorage.getItem('gk_save_data') || '{}');
+            return saved?.economy?.xp || 0;
+        }
+
+        function savePopupProfile() {
+            const dob = document.getElementById('popup-dob').value.trim();
+            const gender = document.getElementById('popup-gender').value.trim() || '';
+            const country = document.getElementById('popup-country').value.trim();
+            const profile = { dob, gender, country };
+            if (window.GK_State && window.GK_State.profile && window.GK_State.profile.email) {
+                profile.email = window.GK_State.profile.email;
+            }
+            localStorage.setItem('gk_user_profile', JSON.stringify(profile));
+            
+            if (window.GK_State) {
+                window.GK_State.profile = profile;
+                if (window.saveGameState) window.saveGameState();
+                if (window.syncToCloud) window.syncToCloud();
+            }
+            
+            document.getElementById('profile-popup-overlay').style.display = 'none';
+        }
+
+        function skipPopupProfile() {
+            // Save an empty or partial profile so we don't ask again
+            localStorage.setItem('gk_user_profile_skipped', 'true');
+            const currentStr = localStorage.getItem('gk_user_profile');
+            if (!currentStr) {
+                const profile = { dob: '', gender: '', country: '' };
+                if (window.GK_State && window.GK_State.profile && window.GK_State.profile.email) {
+                    profile.email = window.GK_State.profile.email;
+                }
+                localStorage.setItem('gk_user_profile', JSON.stringify(profile));
+                if (window.GK_State) {
+                    window.GK_State.profile = profile;
+                    if (window.saveGameState) window.saveGameState();
+                    if (window.syncToCloud) window.syncToCloud();
+                }
+            }
+            document.getElementById('profile-popup-overlay').style.display = 'none';
+        }
+
+        function handleShootOutClick() {
+            const xp = getPlayerXP();
+            const devUnlock = document.getElementById('dev-unlock-all-games').checked;
+            
+            if (xp >= 50 || devUnlock) {
+                window.location.href = 'games/shoot-out/index.html';
+            } else {
+                showCustomAlert("LOCKED", "Shoot Out is locked. It will unlock at 50 XP.");
+            }
+        }
+    </script>
+    <script src="services/gameState.js?v=2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bgMusic = document.getElementById('bg-music');
+            const soundBtn = document.getElementById('sound-toggle-btn');
+            const drawerMute = document.getElementById('drawer-mute-audio');
+            
+            const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+            if(bgMusic) {
+                bgMusic.muted = isMuted;
+                if (!isMuted) bgMusic.play().catch(e => console.log('Autoplay prevented by browser:', e));
+            }
+            if(soundBtn) soundBtn.innerText = isMuted ? '🔇' : '🔊';
+            if(drawerMute) drawerMute.checked = isMuted;
+            
+
+            soundBtn.addEventListener('click', () => {
+                const newMutedState = !bgMusic.muted;
+                bgMusic.muted = newMutedState;
+                soundBtn.innerText = newMutedState ? '🔇' : '🔊';
+                localStorage.setItem('gk_audio_muted', newMutedState ? 'true' : 'false');
+                if(drawerMute) drawerMute.checked = newMutedState;
+                if(!newMutedState) bgMusic.play().catch(e => console.log(e));
+            });
+            
+            window.toggleGlobalAudio = function(isMuted) {
+                bgMusic.muted = isMuted;
+                soundBtn.innerText = isMuted ? '🔇' : '🔊';
+                localStorage.setItem('gk_audio_muted', isMuted ? 'true' : 'false');
+                if(!isMuted) bgMusic.play().catch(e => console.log(e));
+            };
+
+            // Shoot Out Button Logic
+            const shootOutBtn = document.getElementById('btnShootOut');
+            const devUnlockCheckbox = document.getElementById('dev-unlock-all-games');
+            
+            function updateShootOutBtn() {
+                const currentXp = getPlayerXP();
+                const devUnlocked = devUnlockCheckbox.checked;
+                
+                if (currentXp >= 50 || devUnlocked) {
+                    shootOutBtn.innerText = "Shoot Out";
+                    shootOutBtn.style.opacity = "1";
+                    shootOutBtn.style.background = "linear-gradient(135deg, rgba(255, 153, 0, 0.8), rgba(255, 85, 0, 0.8))";
+                } else {
+                    shootOutBtn.innerText = "🔒 Shoot Out (Unlocks at 50 XP)";
+                    shootOutBtn.style.opacity = "0.7";
+                    shootOutBtn.style.background = "linear-gradient(135deg, rgba(100, 100, 100, 0.8), rgba(50, 50, 50, 0.8))";
+                }
+            }
+            
+            // Wait for GameState to populate from Firebase if it's async
+            const checkOverlayLogic = () => {
+                updateShootOutBtn();
+                
+                // Overlay logic
+                const currentXp = getPlayerXP();
+                // Ensure notifications object exists
+                if (window.GK_State && !window.GK_State.notifications) {
+                    window.GK_State.notifications = { seenShootOutUnlock: false };
+                }
+                const hasSeenUnlock = window.GK_State?.notifications?.seenShootOutUnlock === true;
+                
+                if (currentXp >= 50 && !hasSeenUnlock) {
+                    let jumpSrc = 'assets/locker-room/images/avatars/jump.png';
+                    const equippedOutfit = window.GK_State?.player?.equippedOutfitId || localStorage.getItem('gk_equipped_outfit') || 'beginner';
+                    
+                    if (equippedOutfit === 'competitive') {
+                        jumpSrc = 'assets/locker-room/images/avatars/comp_jump.png';
+                    } else if (equippedOutfit === 'beach') {
+                        jumpSrc = 'assets/locker-room/images/avatars/beach_jump.png';
+                    } else if (equippedOutfit === 'suit') {
+                        jumpSrc = 'assets/locker-room/images/avatars/suit_jump.png';
+                    }
+                    
+                    document.getElementById('unlock-avatar-img').src = jumpSrc;
+                    document.getElementById('unlock-overlay').style.display = 'flex';
+                    
+                    if (window.GK_State) {
+                        window.GK_State.notifications.seenShootOutUnlock = true;
+                        if (window.saveGameState) window.saveGameState();
+                        if (window.syncToCloud) window.syncToCloud();
+                    }
+                } else {
+                    // Check if we need to sync a locally saved profile from register page to Firebase
+                    const localProfileStr = localStorage.getItem('gk_user_profile');
+                    if (localProfileStr) {
+                        try {
+                            const localProfile = JSON.parse(localProfileStr);
+                            if (window.GK_State && !window.GK_State.profile) {
+                                window.GK_State.profile = localProfile;
+                                if (window.saveGameState) window.saveGameState();
+                                if (window.syncToCloud) window.syncToCloud();
+                            }
+                        } catch(e) {}
+                    } else if (window.GK_State && window.GK_State.hasSeenDemoPrompt !== true && localStorage.getItem('gk_is_guest') !== 'true') {
+                        const p = window.GK_State.profile;
+                        const isProfileEmpty = !p || (!p.dob && !p.gender && !p.country);
+                        if (isProfileEmpty) {
+                            setTimeout(() => {
+                                document.getElementById('profile-popup-overlay').style.display = 'flex';
+                                window.GK_State.hasSeenDemoPrompt = true;
+                                if (window.saveGameState) window.saveGameState();
+                                if (window.syncToCloud) window.syncToCloud();
+                            }, 500);
+                        }
+                    }
+                }
+            };
+
+            if (window.GK_State_Hydrated) {
+                checkOverlayLogic();
+            } else {
+                window.addEventListener('gk_state_updated', checkOverlayLogic, { once: true });
+                // Fallback in case of authentication failure or guest mode
+                setTimeout(() => { if (!window.GK_State_Hydrated) checkOverlayLogic(); }, 5000);
+            }
+
+            devUnlockCheckbox.addEventListener('change', updateShootOutBtn);
+        });
+
+        const unlockAudio = () => {
+            const bgMusic = document.getElementById('bg-music');
+            const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+            
+            if (bgMusic && bgMusic.paused && !isMuted) {
+                let playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        ['click', 'touchstart', 'touchend'].forEach(evt => document.body.removeEventListener(evt, unlockAudio));
+                    }).catch(e => {
+                        console.log('Browser requires stronger interaction to unlock audio:', e);
+                    });
+                }
+            }
+        };
+
+        ['click', 'touchstart', 'touchend'].forEach(evt => {
+            document.body.addEventListener(evt, unlockAudio, { passive: true });
+        });
+    
+        // Pause audio when app is minimized/tab is switched
+        document.addEventListener("visibilitychange", function() {
+            const bgMusic = document.getElementById('bg-music');
+            if (!bgMusic) return;
+            
+            if (document.hidden) {
+                bgMusic.pause();
+            } else {
+                const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+                if (!isMuted) {
+                    bgMusic.play().catch(e => console.log('Resume playback failed:', e));
+                }
+            }
+        });
+</script>
+</body>
+</html>

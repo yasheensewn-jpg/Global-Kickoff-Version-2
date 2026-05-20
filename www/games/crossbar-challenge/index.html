@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Crossbar Challenge</title>
+    <link rel="stylesheet" href="style.css?v=1.5">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/global-ui.css">
+</head>
+<body>
+
+    <div id="canvasWrapper">
+        <div id="bgWrapper"></div>
+        <!-- Timer Bar -->
+        <div id="timer-bar-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: #333; z-index: 5000;">
+            <div id="shotClock" style="width: 100%; height: 100%; background: #00ff00; transition: background-color 0.3s, width 0.1s linear;"></div>
+        </div>
+        
+        <!-- Dribble Slalom Style HUD Overlays -->
+        <button class="game-back-btn" onclick="window.location.href='../../menu.html'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button id="sound-toggle-btn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 65px); left: 15px; z-index: 10000; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; pointer-events: auto; color: white; display: flex; align-items: center; justify-content: center;">🔊</button>
+        <audio id="bg-music" loop preload="none"></audio>
+        <div class="match-state-panel" id="match-state-panel">
+            <div>Attempt: <span id="attemptCount">1</span>/3</div>
+            <div>Hits: <span id="hitCount">0</span></div>
+        </div>
+
+        <div class="level-control-panel">
+            <label for="levelSlider">Level: <span id="levelDisplay">1</span></label>
+            <div style="display: flex; align-items: center; gap: 5px; justify-content: center;">
+                <button id="levelDownBtn" style="background:none; border:none; color:white; cursor:pointer;">◀</button>
+                <input type="range" id="levelSlider" min="1" max="100" value="1">
+                <button id="levelUpBtn" style="background:none; border:none; color:white; cursor:pointer;">▶</button>
+            </div>
+        </div>
+        
+        <!-- Dev Panel Toggle Button -->
+        <button id="devMenuBtn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 12px); right: 12px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; width: 52px; height: 52px; cursor: pointer; z-index: 10000; pointer-events: auto; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;"><img src="../../assets/dribble/Soccer%20gear.png" style="width: 47px; height: 47px; object-fit: contain; pointer-events: none; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.4);"></button>
+
+        <div id="gameContainer">
+        <!-- Flash overlay -->
+        <div id="flashOverlay"></div>
+        <div id="message"></div>
+        
+        <!-- Special Utility Overlays -->
+        <div id="strobeOverlay" class="hidden"></div>
+        <svg id="patternCanvas" class="hidden" width="100%" height="100%" style="position:absolute; top:0; left:0; z-index:40; pointer-events:none;"></svg>
+        <div id="rocketExplosion"></div>
+        <div id="crackedScreen"></div>
+        <div id="moonTimerBar"></div>
+
+        <!-- Game Area Elements -->
+        <div id="goal">
+            <!-- Target Box dynamically sized -->
+            <div id="targetBox"></div>
+        </div>
+        
+        <div id="ballShadow"></div>
+        <div id="ball"></div>
+        <img id="tutorialGlove" src="../../assets/crossbar/transparent_glove.png" class="hidden" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 680px); left: 50%; margin-left: -30px; width: 60px; height: auto; z-index: 150; pointer-events: none; filter: drop-shadow(0 0 10px rgba(255, 71, 87, 0.8));">
+
+        <!-- Move Selector UI -->
+        <div id="moveSelectorUI">
+            <div id="moveDropdownMenu">
+                <div class="menu-item active" data-move="basic_kick" data-icon="⚡">
+                    <span class="m-icon">⚡</span>
+                    <span class="m-text">Basic Kick</span>
+                </div>
+                <div class="menu-item" data-move="romeo_rocket" data-icon="🚀">
+                    <span class="m-icon">🚀</span>
+                    <span class="m-text">Romeo Rocket</span>
+                </div>
+                <div class="menu-item" data-move="scarlett_moonball" data-icon="🌙">
+                    <span class="m-icon">🌙</span>
+                    <span class="m-text">Scarlett Moonball</span>
+                </div>
+                <div class="menu-item" data-move="hi_jinx" data-icon="🎭">
+                    <span class="m-icon">🎭</span>
+                    <span class="m-text">The Hi-Jinx</span>
+                </div>
+            </div>
+            
+            <button id="moveToggleBtn">
+                <span id="currentMoveIcon">⚡</span>
+                <span id="currentMoveLabel">BASIC KICK</span>
+                <span id="moveToggleArrow">▲</span>
+            </button>
+        </div>
+
+        <!-- UI Overlays -->
+        <div id="jinx-launch-arrow" class="hidden" style="position: absolute; left: 50%; bottom: 18%; transform: translateX(-50%); pointer-events: none; z-index: 1000; animation: pulse 1s infinite;">
+            <svg width="50" height="70" viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.8)) drop-shadow(0 4px 6px rgba(0,0,0,0.6));">
+                <path d="M30 75 L10 50 L20 50 L20 5 L40 5 L40 50 L50 50 Z" fill="#00e5ff" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div id="special-tutorial-text" class="hidden" style="position: absolute; top: 15%; left: 5%; width: 90%; text-align: center; color: white; text-shadow: 2px 2px 4px #000; z-index: 10005; pointer-events: none; padding: 15px; box-sizing: border-box; background: rgba(50, 50, 50, 0.85); border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
+        <div id="crossbar-glare-tutorial-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h2 style="color: #ffdd00; font-family: sans-serif; font-size: 1.8rem; text-shadow: 2px 2px 4px #000; margin-bottom: 20px; text-transform: uppercase;">Hazard: Sun Glare</h2>
+            <p style="color: white; font-family: sans-serif; font-size: 1.2rem; margin-bottom: 40px; line-height: 1.4;">Warning: Extreme Sun Glare will obstruct your vision.<br><br><strong style="color: #ffdd00;">Watch the green alignment cue closely!</strong></p>
+            <button id="closeGlareTutorialBtn" style="padding: 12px 30px; font-size: 1.2rem; background: #ffdd00; color: #000; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 221, 0, 0.5);">GOT IT</button>
+        </div>
+        <div id="crossbar-hijinx-tip-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h2 style="color: #00e5ff; font-family: sans-serif; font-size: 1.8rem; text-shadow: 2px 2px 4px #000; margin-bottom: 20px;">TIP: BEAT THE GLARE</h2>
+            <p style="color: white; font-family: sans-serif; font-size: 1.2rem; margin-bottom: 15px; line-height: 1.4;">Purchase and use the <strong style="color: #00e5ff;">Hi-Jinx</strong> move to counter the solar glare.</p>
+            <p style="color: #aaa; font-family: sans-serif; font-size: 0.9rem; margin-bottom: 40px; line-height: 1.4;">Hi Jinx Special move will give you more chances to hit the crossbar correctly</p>
+            <button id="closeHijinxTipBtn" style="padding: 12px 30px; font-size: 1.2rem; background: #00e5ff; color: #000; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 229, 255, 0.5);">GOT IT</button>
+        </div>
+        <div id="crossbar-wind-tutorial-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h2 style="color: #00d2ff; font-family: sans-serif; font-size: 1.8rem; text-shadow: 2px 2px 4px #000; margin-bottom: 20px; text-transform: uppercase;">Hazard: Strong Wind</h2>
+            <p style="color: white; font-family: sans-serif; font-size: 1.2rem; margin-bottom: 40px; line-height: 1.4;">Warning: The wind is howling. Your shot will blow off course.<br><br><strong style="color: #38ef7d;">Tip: Angle your swipe into the wind to compensate!</strong></p>
+            <button id="closeWindTutorialBtn" style="padding: 12px 30px; font-size: 1.2rem; background: #00d2ff; color: #000; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 210, 255, 0.5);">GOT IT</button>
+        </div>
+        <div id="crossbar-moonball-tip-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h2 style="color: #38ef7d; font-family: sans-serif; font-size: 1.8rem; text-shadow: 2px 2px 4px #000; margin-bottom: 20px;">TIP: BEAT THE WIND</h2>
+            <p style="color: white; font-family: sans-serif; font-size: 1.2rem; margin-bottom: 15px; line-height: 1.4;">Purchase and use the <strong style="color: #ff4757;">Scarlett Moonball</strong>.</p>
+            <p style="color: #aaa; font-family: sans-serif; font-size: 0.9rem; margin-bottom: 40px; line-height: 1.4;">The Moonball's heavy trajectory cuts right through the breeze, reducing the wind's effect by 60%.</p>
+            <button id="closeMoonballTipBtn" style="padding: 12px 30px; font-size: 1.2rem; background: #38ef7d; color: #000; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(56, 239, 125, 0.5);">GOT IT</button>
+        </div>
+        <div id="crossbar-rocket-tip-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h2 style="color: #38ef7d; font-family: sans-serif; font-size: 1.8rem; text-shadow: 2px 2px 4px #000; margin-bottom: 20px;">TIP: USE THE ROMEO ROCKET</h2>
+            <p style="color: white; font-family: sans-serif; font-size: 1.2rem; margin-bottom: 15px; line-height: 1.4;">Purchase and use the <strong style="color: #ff4757;">Romeo Rocket</strong> to beat the crowd.</p>
+            <p style="color: #aaa; font-family: sans-serif; font-size: 0.9rem; margin-bottom: 40px; line-height: 1.4;">The Romeo Rocket ignores the Crowd Noise hazard, greatly improving your chances of a hit.</p>
+            <button id="closeRocketTipBtn" style="padding: 12px 30px; font-size: 1.2rem; background: #38ef7d; color: #000; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(56, 239, 125, 0.5);">GOT IT</button>
+        </div>
+        <div id="crossbar-crowd-tutorial-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h2 style="color: #ff4757; font-family: sans-serif; font-size: 1.8rem; text-shadow: 2px 2px 4px #000; margin-bottom: 20px; text-transform: uppercase;">Hazard: Crowd Noise</h2>
+            <p style="color: white; font-family: sans-serif; font-size: 1.2rem; margin-bottom: 40px; line-height: 1.4;">Warning: Crowd noise is worsening your concentration. The screen will shake and blur.<br><br><strong style="color: #00d2ff;">Focus harder on the crossbar!</strong></p>
+            <button id="closeCrowdTutorialBtn" style="padding: 12px 30px; font-size: 1.2rem; background: #ff4757; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.5);">GOT IT</button>
+        </div>
+        <div id="crossbar-moving-tutorial-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h2 style="color: #00d2ff; font-family: sans-serif; font-size: 1.8rem; text-shadow: 2px 2px 4px #000; margin-bottom: 20px;">TARGET IS MOVING!</h2>
+            <p style="color: white; font-family: sans-serif; font-size: 1.2rem; margin-bottom: 40px; line-height: 1.4;">Time your swipe so you hit the crossbar<br>when the target box turns <strong style="color: #38ef7d;">GREEN</strong>.</p>
+            <button id="closeMovingTutorialBtn" style="padding: 12px 30px; font-size: 1.2rem; background: #00d2ff; color: #000; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 210, 255, 0.5);">GOT IT</button>
+        </div>
+        <div id="crossbar-tutorial-overlay" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h2 style="color: white; font-family: sans-serif; font-size: 1.8rem; text-shadow: 2px 2px 4px #000; margin-bottom: 30px;">Swipe UP on the ball<br>to hit the green crossbar</h2>
+            <img src="../../assets/shoot-out/transparent_glove.png" style="width: 60px; pointer-events: none; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)); margin-bottom: 40px; animation: pulse 1.5s infinite;">
+            <button id="closeCrossbarTutorialBtn" style="padding: 12px 30px; font-size: 1.2rem; background: #38ef7d; color: #000; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(56, 239, 125, 0.5);">GOT IT</button>
+        </div>
+        <div id="uiOverlay">
+            <button id="nextBtn" class="action-btn" style="display: none;">Next Attempt</button>
+            <button id="goAgainBtn" class="action-btn" style="display: none;">Go Again</button>
+            <div id="fuelGaugeContainer" style="display: none;">
+                <div id="fuelGaugeTrack">
+                    <div id="fuelGaugeFill"></div>
+                </div>
+                <div id="fuelGaugeLabel">CHARGE</div>
+            </div>
+        </div>
+
+        <!-- Wind Visuals Container -->
+        <div id="windVisuals"></div>
+
+        <!-- Wind HUD Indicator -->
+        <div id="windIndicator" class="hidden">
+            <span id="windArrow">➔</span>
+            <span id="windSpeed">0 km/h</span>
+        </div>
+
+        <!-- Dev Panel Toggle Button moved to canvas wrapper -->
+        <div id="glareOverlay" class="glare-washout"></div>
+        <div id="flareContainer"><div id="lensFlare"></div></div>
+        </div> <!-- Close gameContainer -->
+
+        <!-- Dev Panel -->
+        <div id="hub-backdrop" style="display: none;"></div>
+        <div id="devPanel" style="position: absolute; top: 0; right: -100%; width: 70%; max-width: 350px; height: 100%; background: #222; z-index: 10000; transition: right 0.3s ease-in-out; box-shadow: -5px 0 15px rgba(0,0,0,0.5); padding: 20px; color: white; display: flex; flex-direction: column; pointer-events: auto; overflow-y: auto;">
+            <button id="closeDevBtn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 10px); right: 10px; background: none; border: none; color: #888; font-size: 20px; cursor: pointer; font-weight: bold;">X</button>
+
+            <div style="background: #222; padding: 15px; text-align: center; border-bottom: 2px solid #00d2ff; margin-bottom: 20px; display: flex; justify-content: space-around;">
+                <div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; letter-spacing: 1px;">TOTAL XP</div>
+                    <div id="global-xp" style="color: #00ff00; font-size: 24px; font-weight: bold; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 5px);">0</div>
+                </div>
+                <div>
+                    <div style="color: #888; font-size: 12px; font-weight: bold; letter-spacing: 1px;">TOKENS</div>
+                    <div id="global-tokens" style="color: #ffd700; font-size: 24px; font-weight: bold; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 5px);">0</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; padding: 0 15px;">
+                <div style="font-weight: bold; font-family: sans-serif; margin-bottom: 5px; font-size: 1rem; color: white;">Stamina: <span id="global-stamina">500</span>/500</div>
+                <div style="width: 100%; height: 15px; background: #444; border-radius: 8px; overflow: hidden;">
+                    <div id="global-stamina-bar" style="width: 100%; height: 100%; background: #38ef7d; transition: width 0.3s ease;"></div>
+                </div>
+                <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 8px); font-size: 0.75rem; color: #aaa; font-family: sans-serif; line-height: 1.3;">To keep playing recharge your stamina in the recovery hub in the locker room. Stamina also recharges daily.</div>
+            </div>
+
+            <!-- Unified Accordion Group -->
+            <div id="unifiedDrawerGroup" style="padding-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; font-family: sans-serif;">
+                <details style="margin-bottom: 15px;">
+                    <summary style="cursor: pointer; font-weight: bold; outline: none; color: #ffeb3b; font-size: 1rem; text-transform: uppercase;">Special Moves</summary>
+                    <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); display: flex; flex-direction: column; gap: 15px;">
+                        <!-- Romeo Rocket -->
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <div style="font-size: 24px;">🚀</div>
+                                <div>
+                                    <div style="font-weight: bold; color: #fff; font-size: 0.9rem;">Romeo Rocket</div>
+                                    <div style="font-size: 0.75rem; color: #aaa;">Explosive swipe attack.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button id="showTutorialBtn" style="background: rgba(255, 71, 87, 0.2); border: 1px solid #ff4757; color: #ff4757; padding: 6px; font-size: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; text-transform: uppercase;">Tutorial</button>
+                                <button id="btn-crossbar-romeo" onclick="window.purchaseItem('crossbar', 'moves', 'romeo_rocket'); window.updateCrossbarUI();" style="flex: 1; padding: 8px; border-radius: 4px; border: none; font-weight: bold; font-family: sans-serif; cursor: pointer; transition: background 0.2s; background: #00d2ff; color: #000;">Purchase: 150 Tokens</button>
+                            </div>
+                        </div>
+
+                        <!-- Scarlett Moonball -->
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <div style="font-size: 24px;">🌙</div>
+                                <div>
+                                    <div style="font-weight: bold; color: #fff; font-size: 0.9rem;">Scarlett Moonball</div>
+                                    <div style="font-size: 0.75rem; color: #aaa;">Pattern tracing lob.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button id="showTutorialBtn_moonball" style="background: rgba(255, 71, 87, 0.2); border: 1px solid #ff4757; color: #ff4757; padding: 6px; font-size: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; text-transform: uppercase;">Tutorial</button>
+                                <button id="btn-crossbar-moonball" onclick="window.purchaseItem('crossbar', 'moves', 'scarlett_moonball'); window.updateCrossbarUI();" style="flex: 1; padding: 8px; border-radius: 4px; border: none; font-weight: bold; font-family: sans-serif; cursor: pointer; transition: background 0.2s; background: #00d2ff; color: #000;">Purchase: 150 Tokens</button>
+                            </div>
+                        </div>
+
+                        <!-- The Hi-Jinx -->
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <div style="font-size: 24px;">🎭</div>
+                                <div>
+                                    <div style="font-weight: bold; color: #fff; font-size: 0.9rem;">The Hi-Jinx</div>
+                                    <div style="font-size: 0.75rem; color: #aaa;">3-orb trick shot.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button id="showTutorialBtn_hijinx" style="background: rgba(255, 71, 87, 0.2); border: 1px solid #ff4757; color: #ff4757; padding: 6px; font-size: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; text-transform: uppercase;">Tutorial</button>
+                                <button id="btn-crossbar-hijinx" onclick="window.purchaseItem('crossbar', 'moves', 'hi_jinx'); window.updateCrossbarUI();" style="flex: 1; padding: 8px; border-radius: 4px; border: none; font-weight: bold; font-family: sans-serif; cursor: pointer; transition: background 0.2s; background: #00d2ff; color: #000;">Purchase: 150 Tokens</button>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <details style="margin-bottom: 15px;">
+                    <summary style="cursor: pointer; font-weight: bold; outline: none; color: #ff9800; font-size: 1rem; text-transform: uppercase;">Special Gear</summary>
+                    <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 10px); font-size: 0.85rem; color: rgba(255,255,255,0.8);">
+                        <p style="margin-bottom: 15px;">Purchase and equip gear to enhance your abilities.</p>
+                        
+                        <div style="text-align: center; margin-bottom: 15px; color: #aaa; font-family: monospace;">
+                            Available Tokens: <span id="lockerTokenDisplay" style="color: #ffd700; font-weight: bold; font-size: 16px;">0</span>
+                        </div>
+            
+                        <div id="equipmentList" style="display: flex; flex-direction: column; gap: 12px; max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                        </div>
+                    </div>
+                </details>
+
+                <details style="margin-bottom: 15px;">
+                    <summary style="cursor: pointer; font-weight: bold; outline: none; color: #00d2ff; font-size: 1rem; text-transform: uppercase;">Rules</summary>
+                    <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 10px);">
+                        <h5 style="margin: 0 0 5px 0; color: #00d2ff; font-size: 0.85rem;">The Basics</h5>
+                        <p style="margin-top: 0; font-size: 0.85rem; line-height: 1.4; color: rgba(255,255,255,0.8); margin-bottom: 15px;">Flick the ball to hit the green target zone on the crossbar. Hit it twice to progress to the next level.</p>
+
+                        <h5 style="margin: 0 0 5px 0; color: #00d2ff; font-size: 0.85rem;">Hazards</h5>
+                        <ul style="margin-top: 0; font-size: 0.85rem; line-height: 1.4; padding-left: 20px; color: rgba(255,255,255,0.8); margin-bottom: 15px;">
+                            <li><strong>Wind:</strong> Pushes your ball off-course mid-flight.</li>
+                            <li><strong>Crowd:</strong> Shakes the screen and ball under pressure.</li>
+                            <li style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 4px);"><strong>Glare:</strong> Blinds your view of the target.</li>
+                        </ul>
+
+                        <h5 style="margin: 0 0 5px 0; color: #38ef7d; font-size: 0.85rem;">Bonus Rounds</h5>
+                        <p style="margin-top: 0; font-size: 0.85rem; line-height: 1.4; color: rgba(255,255,255,0.8);">Keep your eyes on the sky! Every 10 wins (starting after Level 14), a special <strong>Winged Money Bag</strong> will appear.<br><br>During this bonus round, all hazards are disabled and you must rely entirely on your ⚡ <strong>Basic Kick</strong>. The bag will teleport and hover in the sky for 2 seconds at a time. Strike the bag to earn a massive <strong>500 Token</strong> bonus!</p>
+                    </div>
+                </details>
+                <label style="display: flex; align-items: center; cursor: pointer; font-size: 15px; color: white; margin-bottom: 25px; padding-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); border-top: 1px solid rgba(255,255,255,0.1);">
+                    <input type="checkbox" id="drawer-mute-audio" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" onchange="if(window.toggleGlobalAudio) window.toggleGlobalAudio(this.checked)"> 
+                    Mute All Audio
+                </label>
+                
+                <div id="dev-options-panel" style="display: none;">
+                    <details style="margin-bottom: 15px;">
+                        <summary style="cursor: pointer; font-weight: bold; outline: none; color: #38ef7d; font-size: 1rem; text-transform: uppercase;">Developer Options</summary>
+                        <div style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); padding-bottom: 15px;">
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: flex; align-items: center; cursor: pointer; font-size: 15px; color: white;">
+                                    <input type="checkbox" id="devDisableTimerToggle" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;"> 
+                                    Disable Timer
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; color: white; font-family: sans-serif; font-size: 14px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 8px); cursor: pointer;">
+                                    <input type="checkbox" id="infiniteStaminaToggle">
+                                    Infinite Stamina
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; color: white; font-family: sans-serif; font-size: 14px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 8px); cursor: pointer;">
+                                    <input type="checkbox" id="devUnlockMovesToggle">
+                                    Unlock All Moves
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; color: white; font-family: sans-serif; font-size: 14px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 8px); cursor: pointer;">
+                                    <input type="checkbox" id="devUnlockLevelsToggle">
+                                    Unlock All Levels
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; color: white; font-family: sans-serif; font-size: 14px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 8px); cursor: pointer;">
+                                    <input type="checkbox" id="devDisableTutorialsToggle">
+                                    Disable Tutorials
+                                </label>
+                            </div>
+            
+                            <hr style="border: none; border-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 1px) solid rgba(255, 255, 255, 0.1); margin: 15px 0;">
+            
+                            <h4 style="margin-top: 0; margin-bottom: 12px; color: #00d2ff; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Hazards</h4>
+                            
+                            <label style="display: flex; align-items: center; margin-bottom: 15px; cursor: pointer; font-size: 15px; color: #38ef7d; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                                <input type="checkbox" id="randomHazardToggle" checked style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;"> 
+                                Random Allocation (Lvl 10+)
+                            </label>
+                            
+                            <label style="display: flex; align-items: center; margin-bottom: 10px; cursor: pointer; font-size: 15px; color: white;">
+                                <input type="checkbox" id="windToggle" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;"> 
+                                Enable Wind
+                            </label>
+                            
+                            <label style="display: flex; align-items: center; margin-bottom: 10px; cursor: pointer; font-size: 15px; color: white;">
+                                <input type="checkbox" id="glareToggle" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;"> 
+                                Enable Glare
+                            </label>
+                            
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 15px; color: white;">
+                                <input type="checkbox" id="crowdToggle" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;"> 
+                                Enable Crowd
+                            </label>
+            
+                            <hr style="border: none; border-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 1px) solid rgba(255, 255, 255, 0.1); margin: 15px 0;">
+                            <h4 style="margin-top: 0; margin-bottom: 12px; color: #ffd700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Economy Cheats</h4>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <button onclick="window.modifyStatByPercentage('xp', -5)" style="flex: 1; padding: 8px; background: #ff4757; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">-5% XP</button>
+                                <button onclick="window.modifyStatByPercentage('xp', 5)" style="flex: 1; padding: 8px; background: #00ff00; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+5% XP</button>
+                                <button onclick="window.addXP(2500)" style="flex: 1; padding: 8px; background: #00ff00; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+2500</button>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <button onclick="window.modifyStatByPercentage('tokens', -5)" style="flex: 1; padding: 8px; background: #ff4757; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">-5% TKN</button>
+                                <button onclick="window.modifyStatByPercentage('tokens', 5)" style="flex: 1; padding: 8px; background: #ffd700; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+5% TKN</button>
+                                <button onclick="window.addTokens(2500)" style="flex: 1; padding: 8px; background: #ffd700; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+2500</button>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <button onclick="window.modifyStatByPercentage('stamina', -5)" style="flex: 1; padding: 8px; background: #ff4757; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">-5% STM</button>
+                                <button onclick="window.modifyStatByPercentage('stamina', 5)" style="flex: 1; padding: 8px; background: #38ef7d; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+5% STM</button>
+                                <button onclick="window.addStamina(200)" style="flex: 1; padding: 8px; background: #38ef7d; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">+200</button>
+                            </div>
+                            <button id="devLaunchBonusBtn" style="width: 100%; padding: 8px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 5px); background: #00e5ff; color: black; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">Launch Token Game</button>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <button onclick="if(window.syncToCloud) { window.syncToCloud().then(()=>alert('Progress Saved to Cloud!')).catch(()=>alert('Failed to save.')); } else { alert('Save feature not ready.'); }" style="width: 100%; padding: 12px; margin-bottom: 10px; background: #38ef7d; color: black; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; text-transform: uppercase;">Save Progress</button>
+            <button onclick="if(window.logoutUser) window.logoutUser('../../index.html'); else { localStorage.removeItem('gk_player_id'); window.location.href='../../index.html'; }" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #ff4757; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; text-transform: uppercase;">Log Out</button>
+
+            <!-- Main Menu Button -->
+            <button onclick="window.location.href='../../menu.html'" style="width: 100%; margin-bottom: 15px; padding: 12px; background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; color: #ff4757; border-radius: 6px; cursor: pointer; font-family: sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 1px; transition: all 0.2s;">
+                RETURN TO MAIN MENU
+            </button>
+            <button onclick="window.location.href='../../features/locker-room/index.html'" style="width: 100%; margin-bottom: 25px; padding: 12px; background: rgba(0, 210, 255, 0.1); border: 1px solid #00d2ff; color: #00d2ff; border-radius: 6px; cursor: pointer; font-family: sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 1px; transition: all 0.2s;">
+                RETURN TO LOCKER ROOM
+            </button>
+    </div>
+    
+    <div id="gameCountdownOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100000; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <div id="gameCountdownText" style="font-size: 150px; font-weight: 800; color: #fff; text-shadow: 0 0 30px #00d2ff; font-family: 'Impact', sans-serif;">3</div>
+        <button id="countdownRulesBtn" style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 50px); padding: 15px 30px; font-size: 20px; font-weight: bold; background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">GO TO RULES</button>
+        <button id="skipCountdownBtn" style="margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 20px); background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: white; padding: 8px 16px; font-family: sans-serif; font-weight: bold; cursor: pointer; z-index: 100001; transition: opacity 0.2s;">SKIP &gt;&gt;</button>
+    </div>
+    
+
+
+    <script src="../../services/gameState.js?v=2"></script>
+    <script src="game.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const isCapacitor = window.origin && window.origin.includes('capacitor://');
+            if (!isCapacitor) {
+                document.body.classList.add('is-web-app');
+            }
+
+            const bgMusic = document.getElementById('bg-music');
+            const soundBtn = document.getElementById('sound-toggle-btn');
+            const drawerMute = document.getElementById('drawer-mute-audio');
+            
+            const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+            if(bgMusic) bgMusic.muted = isMuted;
+            if(soundBtn) soundBtn.innerText = isMuted ? '🔇' : '🔊';
+            if(drawerMute) drawerMute.checked = isMuted;
+
+
+            
+            if(soundBtn) {
+                soundBtn.addEventListener('click', () => {
+                    if (bgMusic.muted) {
+                        bgMusic.muted = false;
+                        soundBtn.innerText = '🔊';
+                        localStorage.setItem('gk_audio_muted', 'false');
+                        if(drawerMute) drawerMute.checked = false;
+                        bgMusic.play().catch(e => console.log(e));
+                    } else {
+                        bgMusic.muted = true;
+                        soundBtn.innerText = '🔇';
+                        localStorage.setItem('gk_audio_muted', 'true');
+                        if(drawerMute) drawerMute.checked = true;
+                    }
+                });
+            }
+
+            window.toggleGlobalAudio = function(isMuted) {
+                if(bgMusic) bgMusic.muted = isMuted;
+                if(soundBtn) soundBtn.innerText = isMuted ? '🔇' : '🔊';
+                localStorage.setItem('gk_audio_muted', isMuted ? 'true' : 'false');
+                if(!isMuted && bgMusic) bgMusic.play().catch(e => console.log(e));
+            };
+        });
+
+        const unlockAudio = () => {
+            const bgMusic = document.getElementById('bg-music');
+            const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+            
+            if (bgMusic && bgMusic.paused && !isMuted) {
+                let playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        ['click', 'touchstart', 'touchend'].forEach(evt => document.body.removeEventListener(evt, unlockAudio));
+                    }).catch(e => {
+                        console.log('Browser requires stronger interaction to unlock audio:', e);
+                    });
+                }
+            }
+        };
+
+        ['click', 'touchstart', 'touchend'].forEach(evt => {
+            document.body.addEventListener(evt, unlockAudio, { passive: true });
+        });
+    
+        // Pause audio when app is minimized/tab is switched
+        document.addEventListener("visibilitychange", function() {
+            const bgMusic = document.getElementById('bg-music');
+            if (!bgMusic) return;
+            
+            if (document.hidden) {
+                bgMusic.pause();
+            } else {
+                const isMuted = localStorage.getItem('gk_audio_muted') === 'true';
+                if (!isMuted) {
+                    bgMusic.play().catch(e => console.log('Resume playback failed:', e));
+                }
+            }
+        });
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "appId": "com.finandflow.globalkickoff",
+  "appName": "Global Kickoff",
+  "webDir": "www",
+  "backgroundColor": "#2f3640",
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#2f3640",
+      "overlaysWebView": true
+    }
+  }
+}
