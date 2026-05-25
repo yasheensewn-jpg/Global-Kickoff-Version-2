@@ -1,26 +1,75 @@
 
 // --- Safe Area Fallback ---
 (function() {
-    var updateSafeArea = function() {
+    var getPlatform = function() {
+        if (window.Capacitor && typeof window.Capacitor.getPlatform === 'function') {
+            return window.Capacitor.getPlatform();
+        }
         var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        var isAndroidNative = window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android';
-        
-        if (isIOS) {
-            document.documentElement.style.setProperty('--ios-safe-top', '50px');
-            document.documentElement.style.setProperty('--ios-safe-bottom', '30px');
-            document.documentElement.classList.add('platform-ios');
-        } else if (isAndroidNative) {
-            document.documentElement.style.setProperty('--ios-safe-top', '40px');
-            document.documentElement.style.setProperty('--ios-safe-bottom', '20px');
-            document.documentElement.classList.add('platform-android');
+        if (isIOS) return 'ios';
+        return 'web';
+    };
+
+    var platform = getPlatform();
+
+    if (platform === 'ios') {
+        document.documentElement.style.setProperty('--ios-safe-top', '50px');
+        document.documentElement.style.setProperty('--ios-safe-bottom', '30px');
+        document.documentElement.classList.add('platform-ios');
+        // Exit early: Do NOT run any Android bottom inset / navigation bar logic on iOS
+        return;
+    }
+
+    if (platform !== 'android') {
+        // Web / other platforms
+        document.documentElement.style.setProperty('--ios-safe-top', '0px');
+        document.documentElement.style.setProperty('--ios-safe-bottom', '0px');
+        return;
+    }
+
+    // Android native platform logic only
+    document.documentElement.style.setProperty('--ios-safe-top', '40px');
+    document.documentElement.style.setProperty('--ios-safe-bottom', '20px');
+    document.documentElement.classList.add('platform-android');
+
+    var applyBottomInset = function(bottomInset) {
+        if (bottomInset > 0) {
+            document.documentElement.classList.add('android-with-nav');
+            if (document.body) document.body.classList.add('android-with-nav');
+            document.documentElement.style.setProperty('--android-nav-bottom', bottomInset + 'px');
         } else {
-            document.documentElement.style.setProperty('--ios-safe-top', '0px');
-            document.documentElement.style.setProperty('--ios-safe-bottom', '0px');
+            document.documentElement.classList.remove('android-with-nav');
+            if (document.body) document.body.classList.remove('android-with-nav');
+            document.documentElement.style.setProperty('--android-nav-bottom', '0px');
+        }
+    };
+
+    var updateSafeArea = function() {
+        if (document.body) {
+            var div = document.createElement('div');
+            div.style.paddingBottom = 'env(safe-area-inset-bottom, 0px)';
+            div.style.position = 'absolute';
+            div.style.visibility = 'hidden';
+            document.body.appendChild(div);
+            var bottomInset = parseInt(window.getComputedStyle(div).paddingBottom) || 0;
+            document.body.removeChild(div);
+            applyBottomInset(bottomInset);
         }
     };
     
     updateSafeArea();
     document.addEventListener('DOMContentLoaded', updateSafeArea);
+    window.addEventListener('resize', updateSafeArea);
+    window.addEventListener('orientationchange', updateSafeArea);
+    
+    window.addEventListener('nativeSafeAreaChanged', function(e) {
+        if (e.detail && typeof e.detail.bottom === 'number') {
+            applyBottomInset(e.detail.bottom);
+        }
+        setTimeout(updateSafeArea, 50);
+    });
+    
+    setInterval(updateSafeArea, 500);
 })();
 // services/gameState.js
 
@@ -37,7 +86,11 @@ window.GK_State = {
         currentStamina: 500,
         maxStamina: 500,
         ownedOutfits: ['beginner'],
-        equippedOutfitId: 'beginner'
+        equippedOutfitId: 'beginner',
+        tournamentDailyXP: 0,
+        tournamentStage: 1,
+        tournamentBots: [],
+        tournamentLastEvaluated: null
     },
     catalogues: {
         crossbar: {
@@ -115,16 +168,31 @@ function initGameState() {
     if (window.GK_State.player.slalomLevel === undefined) {
         window.GK_State.player.slalomLevel = parseInt(localStorage.getItem('dribbleSlalomMaxLevel')) || 1;
     }
+
+    // Initialize tournament variables if missing from older saves
+    if (window.GK_State.player.tournamentStage === undefined) {
+        window.GK_State.player.tournamentStage = 1;
+    }
+    if (window.GK_State.player.tournamentBots === undefined) {
+        window.GK_State.player.tournamentBots = [];
+    }
+    if (window.GK_State.player.tournamentLastEvaluated === undefined) {
+        window.GK_State.player.tournamentLastEvaluated = null;
+    }
     
     saveGameState();
     
     // Check for daily midnight reset on load
     checkDailyReset();
+    checkTournamentReset();
 }
 
 window.addEventListener('pageshow', function() {
     if (typeof window.checkDailyReset === 'function') {
         window.checkDailyReset();
+    }
+    if (typeof window.checkTournamentReset === 'function') {
+        window.checkTournamentReset();
     }
 });
 
@@ -145,6 +213,11 @@ function checkDailyReset() {
         const maxStamina = window.GK_State.player.maxStamina || 500;
         window.GK_State.player.currentStamina = maxStamina;
         
+        // Reset tournament daily XP
+        if (window.GK_State.player) {
+            window.GK_State.player.tournamentDailyXP = 0;
+        }
+        
         // Update the saved date
         window.GK_State.system.lastResetDate = today;
         
@@ -158,6 +231,142 @@ function checkDailyReset() {
     }
 }
 window.checkDailyReset = checkDailyReset;
+
+// Tournament Midnight Reset Logic
+function checkTournamentReset(force = false) {
+    if (!window.GK_State || !window.GK_State.player) return;
+    
+    const today = new Date().toDateString();
+    
+    if (!force && window.GK_State.player.tournamentLastEvaluated === today) {
+        return;
+    }
+    
+    const isFirstTime = (window.GK_State.player.tournamentLastEvaluated === null);
+    const bots = window.GK_State.player.tournamentBots || [];
+    const dailyXP = window.GK_State.player.tournamentDailyXP || 0;
+    
+    if (force || (!isFirstTime && bots.length > 0)) {
+        let fraction = 1.0;
+        if (force) {
+            const now = new Date();
+            fraction = (now.getHours() + now.getMinutes() / 60) / 24;
+        }
+        
+        const playerUid = localStorage.getItem('gk_player_id') || 'guest';
+        const playerRow = { uid: playerUid, name: window.GK_State.player.name || 'Guest Player', xp: dailyXP };
+        const botRows = bots.map(b => ({
+            uid: b.uid,
+            name: b.name,
+            xp: Math.floor((b.targetXP || 0) * fraction)
+        }));
+        
+        const allPlayers = [playerRow, ...botRows];
+        allPlayers.sort((a, b) => b.xp - a.xp);
+        
+        const playerRank = allPlayers.findIndex(p => p.uid === playerUid) + 1;
+        const currentStage = window.GK_State.player.tournamentStage || 1;
+        
+        let nextStage = 1;
+        let rewardXP = 0;
+        let rewardTokens = 0;
+        let wonCup = false;
+        
+        if (currentStage === 1) {
+            if (playerRank <= 10) {
+                nextStage = 2;
+                rewardXP = 20;
+                rewardTokens = 20;
+            } else {
+                nextStage = 1;
+            }
+        } else if (currentStage === 2) {
+            if (playerRank <= 8) {
+                nextStage = 3;
+                rewardXP = 50;
+                rewardTokens = 50;
+            } else {
+                nextStage = 1;
+            }
+        } else if (currentStage === 3) {
+            if (playerRank <= 4) {
+                nextStage = 4;
+                rewardXP = 100;
+                rewardTokens = 100;
+            } else {
+                nextStage = 1;
+            }
+        } else if (currentStage === 4) {
+            if (playerRank <= 2) {
+                nextStage = 5;
+                rewardXP = 150;
+                rewardTokens = 150;
+            } else {
+                nextStage = 1;
+            }
+        } else if (currentStage === 5) {
+            if (playerRank === 1) {
+                nextStage = 1;
+                rewardXP = 300;
+                rewardTokens = 300;
+                wonCup = true;
+            } else {
+                nextStage = 1;
+            }
+        }
+        
+        // Add rewards
+        window.GK_State.economy = window.GK_State.economy || { xp: 0, tokens: 0 };
+        window.GK_State.economy.xp = (window.GK_State.economy.xp || 0) + rewardXP;
+        window.GK_State.economy.tokens = (window.GK_State.economy.tokens || 0) + rewardTokens;
+        
+        // Apply Stage Transition
+        window.GK_State.player.tournamentStage = nextStage;
+        
+        if (nextStage > currentStage || wonCup) {
+            window.GK_State.player.tournamentPromotionPending = {
+                oldStage: currentStage,
+                newStage: nextStage,
+                rewardXP: rewardXP,
+                rewardTokens: rewardTokens,
+                wonCup: wonCup
+            };
+        } else {
+            window.GK_State.player.tournamentDemotionPending = {
+                oldStage: currentStage,
+                newStage: nextStage,
+                playerRank: playerRank
+            };
+        }
+        
+        // Trigger a toast notification
+        setTimeout(() => {
+            if (window.showGKNotification) {
+                if (rewardXP > 0 || rewardTokens > 0) {
+                    if (wonCup) {
+                        window.showGKNotification(`🏆 Tournament Cup Won! +${rewardXP} XP, +${rewardTokens} Tokens`, false);
+                    } else {
+                        window.showGKNotification(`🎉 Promoted to Stage ${nextStage}! +${rewardXP} XP, +${rewardTokens} Tokens`, false);
+                    }
+                } else {
+                    window.showGKNotification(`❌ Demoted to Stage 1! Try again today.`, true);
+                }
+            }
+        }, 1000);
+    }
+    
+    // Perform resets
+    window.GK_State.player.tournamentBots = [];
+    window.GK_State.player.tournamentDailyXP = 0;
+    window.GK_State.player.tournamentLastEvaluated = today;
+    
+    saveGameState();
+    
+    if (typeof window.updateHUD === 'function') {
+        window.updateHUD();
+    }
+}
+window.checkTournamentReset = checkTournamentReset;
 
 // Simple deep merge helper
 function deepMerge(target, source) {
@@ -311,6 +520,87 @@ window.clearAllPurchases = function() {
     }
 };
 
+window.showGKNotification = function(message, isError = false) {
+    if (!document.getElementById('gk-notification-style')) {
+        const style = document.createElement('style');
+        style.id = 'gk-notification-style';
+        style.textContent = `
+            .gk-notification-toast {
+                position: fixed;
+                top: 40px;
+                left: 50%;
+                transform: translateX(-50%) translateY(-50px);
+                background: rgba(26, 26, 26, 0.95);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                color: #ffffff;
+                padding: 14px 22px;
+                border-radius: 12px;
+                z-index: 1000000;
+                font-family: 'Outfit', sans-serif;
+                font-size: 15px;
+                font-weight: bold;
+                text-align: center;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+                border: 1px solid rgba(255, 71, 87, 0.8);
+                opacity: 0;
+                transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                pointer-events: none;
+                max-width: 90%;
+                min-width: 280px;
+                justify-content: center;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+            }
+            .gk-notification-toast.show {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            .gk-notification-toast.success {
+                border-color: rgba(56, 239, 125, 0.8);
+            }
+            .gk-notification-toast-icon {
+                font-size: 20px;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    let toast = document.getElementById('gk-notification-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'gk-notification-toast';
+        toast.className = 'gk-notification-toast';
+        if (document.body) {
+            document.body.appendChild(toast);
+        } else {
+            document.documentElement.appendChild(toast);
+        }
+    }
+
+    const icon = isError ? '⚠️' : '🪙';
+    toast.innerHTML = `<span class="gk-notification-toast-icon">${icon}</span> <span>${message}</span>`;
+    
+    if (isError) {
+        toast.classList.remove('success');
+    } else {
+        toast.classList.add('success');
+    }
+    
+    toast.classList.add('show');
+
+    if (window.gkNotificationTimeout) {
+        clearTimeout(window.gkNotificationTimeout);
+    }
+
+    window.gkNotificationTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3500);
+};
+
 window.purchaseItem = function(game, category, itemId) {
     const item = window.GK_State.catalogues[game][category][itemId];
     if (!item || item.owned) return false;
@@ -320,6 +610,10 @@ window.purchaseItem = function(game, category, itemId) {
         item.owned = true;
         saveGameState(true);
         return true;
+    }
+    
+    if (window.showGKNotification) {
+        window.showGKNotification('Not enough tokens!', true);
     }
     return false;
 };
@@ -715,4 +1009,13 @@ window.getCelebrateAvatarUrl = function() {
     if (equippedId === 'beach') return '../../assets/locker-room/images/avatars/beach_celebrate.png';
     if (equippedId === 'suit') return '../../assets/locker-room/images/avatars/suit_celebrate.png';
     return '../../assets/locker-room/images/avatars/celebrate.png'; // Default beginner
+};
+
+window.getBackAvatarUrl = function() {
+    const equippedId = localStorage.getItem('gk_equipped_outfit') || window.GK_State?.player?.equippedOutfitId || 'beginner';
+    
+    if (equippedId === 'competitive') return '../../assets/locker-room/images/avatars/comp_back.png';
+    if (equippedId === 'beach') return '../../assets/locker-room/images/avatars/beach_back.png';
+    if (equippedId === 'suit') return '../../assets/locker-room/images/avatars/suit_back.png';
+    return '../../assets/locker-room/images/avatars/base_back.png'; // Default beginner
 };

@@ -139,6 +139,13 @@ let activeOutfit = window.avatarAssets.outfits[0];
 // Initialize UI
 function initUI() {
     // Header
+    if (window.GK_State && window.GK_State.profile && window.GK_State.profile["avatar name"]) {
+        gameState.player.name = window.GK_State.profile["avatar name"];
+    } else if (window.GK_State && window.GK_State.player && window.GK_State.player.name) {
+        gameState.player.name = window.GK_State.player.name;
+    } else {
+        gameState.player.name = 'Guest Player';
+    }
     elements.playerName.textContent = gameState.player.name;
     if (elements.coinBalance) {
         const currentTokens = window.GK_State?.economy?.tokens || gameState.player.coins || 0;
@@ -171,6 +178,17 @@ function initUI() {
 
         gameState.player.name = newName.trim().substring(0, 15); // Max 15 chars
         elements.playerName.textContent = gameState.player.name;
+        
+        if (window.GK_State) {
+            if (!window.GK_State.player) window.GK_State.player = {};
+            if (!window.GK_State.profile) window.GK_State.profile = {};
+            
+            window.GK_State.player.name = gameState.player.name;
+            window.GK_State.profile["avatar name"] = gameState.player.name;
+            if (window.saveGameState) {
+                window.saveGameState(true);
+            }
+        }
     }
 
     // Stats
@@ -359,7 +377,20 @@ function renderStats() {
 
 window.updateHUD = function() {
     renderStats();
+    const stateName = window.GK_State?.profile?.["avatar name"] || window.GK_State?.player?.name;
+    if (stateName) {
+        gameState.player.name = stateName;
+        if (elements.playerName) {
+            elements.playerName.textContent = gameState.player.name;
+        }
+    }
 };
+
+window.addEventListener('gk_state_updated', () => {
+    if (typeof window.updateHUD === 'function') {
+        window.updateHUD();
+    }
+});
 
 window.purchaseOutfit = function(outfitId, cost) {
     if (window.GK_State.economy.tokens >= cost) {
@@ -378,7 +409,11 @@ window.purchaseOutfit = function(outfitId, cost) {
         renderInventory(window.avatarAssets.outfits, elements.outfitsCarousel);
         renderStats();
     } else {
-        alert("Not enough tokens to purchase this outfit.");
+        if (window.showGKNotification) {
+            window.showGKNotification('Not enough tokens!', true);
+        } else {
+            alert("Not enough tokens to purchase this outfit.");
+        }
     }
 };
 
@@ -545,7 +580,7 @@ function renderMasterLockerRoom(activeCategory, activeGame) {
                         renderStats();
                         renderMasterLockerRoom(activeCategory, activeGame);
                     } else {
-                        alert('Not enough tokens!');
+                        // Handled globally by window.purchaseItem notification toast
                     }
                 } else {
                     if (!(activeCategory === 'moves' || (activeCategory === 'gear' && (activeGame === 'slalom' || activeGame === 'crossbar')))) {
@@ -629,6 +664,14 @@ function openRecoveryModal() {
 }
 
 document.getElementById('beginRecoveryBtn').addEventListener('click', () => {
+    const maxStamina = window.GK_State?.player?.maxStamina || 500;
+    const currentStamina = window.GK_State?.player?.currentStamina || 0;
+    if (currentStamina >= maxStamina) {
+        if (window.showGKNotification) {
+            window.showGKNotification('Stamina is already full!', true);
+        }
+        return;
+    }
     const beginBtn = document.getElementById('beginRecoveryBtn');
     const endBtn = document.getElementById('endRecoveryBtn');
     const timerEl = document.getElementById('recoveryTimer');
@@ -840,3 +883,10 @@ window.addStamina = function(amount) {
     if (window.saveGameState) window.saveGameState();
     renderStats();
 };
+
+// Intercept Android hardware back button
+if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', () => {
+        window.location.href = '../../menu.html';
+    });
+}

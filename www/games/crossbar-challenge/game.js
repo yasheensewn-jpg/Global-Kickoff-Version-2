@@ -194,6 +194,12 @@ function resize() {
 window.addEventListener('resize', resize);
 setTimeout(resize, 0);
 
+// Intercept Android hardware back button
+if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', () => {
+        window.location.href = '../../menu.html';
+    });
+}
 
 
 const handleTargetTap = (e) => {
@@ -1045,11 +1051,11 @@ function finishKick() {
     // BONUS ROUND INTERCEPT:
     if (isBonusRound) {
         if (hasHitTarget) {
-            window.GK_State.economy.tokens += 500;
+            window.GK_State.economy.tokens += 100;
             if (typeof window.saveGameState === 'function') window.saveGameState(true);
             const tokenDisplay = document.getElementById('tokenDisplay');
             if (tokenDisplay) tokenDisplay.innerText = window.GK_State.economy.tokens;
-            showMessage('JACKPOT!\n+500 TOKENS', '#ffd700');
+            showMessage('JACKPOT!\n+100 TOKENS', '#ffd700');
             setTimeout(exitBonusRound, 3000);
         } else if (currentAttempt >= maxAttempts) {
             showMessage('BONUS FAILED!', '#ff4757');
@@ -1083,6 +1089,10 @@ function evaluateProgression() {
 
         window.GK_State.economy.xp += xpEarned;
         window.GK_State.economy.tokens += tokensEarned;
+
+        if (!window.GK_State.player) window.GK_State.player = {};
+        if (window.GK_State.player.tournamentDailyXP === undefined) window.GK_State.player.tournamentDailyXP = 0;
+        window.GK_State.player.tournamentDailyXP += xpEarned;
 
         if (typeof window.saveGameState === 'function') window.saveGameState(true);
 
@@ -2141,8 +2151,7 @@ if (moveToggleBtn && moveDropdownMenu) {
                     showMessage('MOVE UNLOCKED!', '#38ef7d');
                     setTimeout(hideMessage, 1000);
                 } else {
-                    showMessage('NOT ENOUGH TOKENS!', '#ff4757');
-                    setTimeout(hideMessage, 1000);
+                    // Handled globally by window.purchaseItem notification toast
                 }
             }
         });
@@ -2681,8 +2690,7 @@ function renderLockerRoom() {
                     item.equipped = true; // Auto-equip on purchase
                     renderLockerRoom(); // Refresh UI
                 } else {
-                    showMessage('NOT ENOUGH TOKENS!', '#ff4757');
-                    setTimeout(hideMessage, 1500);
+                    // Handled globally by window.purchaseItem notification toast
                 }
             };
         } else {
@@ -2920,7 +2928,7 @@ function initBonusRound() {
         goal.style.background = 'transparent';
     }
     
-    showMessage('BONUS ROUND!\nHIT THE BAG FOR 500 TOKENS', '#ffd700');
+    showMessage('BONUS ROUND!\nHIT THE BAG FOR 100 TOKENS', '#ffd700');
     setTimeout(hideMessage, 2500);
     updateScoreboard();
     resetBall(false);

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Global Tournament</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Bar -->
+        <header class="header-bar">
+            <button class="icon-button back-button" aria-label="Go Back" onclick="window.location.href='../../menu.html'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h1 class="header-title" style="margin: 0; padding: 0; width: 100%;">Tournament</h1>
+                <div id="tournament-timer" style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; color: #ffd700; font-weight: 800; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">Ends in: 00:00:00</div>
+            </div>
+            <div class="header-spacer"></div>
+        </header>
+
+        <!-- Guest/Offline Status Banner -->
+        <div id="status-banner" class="status-banner" style="display: none;">
+            <span>⚠️</span>
+            <span id="status-text">Guest Mode: Showing local tournament rankings</span>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Stage Progression Bar -->
+            <div class="stage-progress-container">
+                <div class="stage-progress-track"></div>
+                <div class="stage-progress-nodes" id="stage-nodes-container">
+                    <div class="stage-progress-node">
+                        <div class="node-circle"></div>
+                        <div class="node-label">Group</div>
+                    </div>
+                    <div class="stage-progress-node">
+                        <div class="node-circle"></div>
+                        <div class="node-label">Knockout</div>
+                    </div>
+                    <div class="stage-progress-node">
+                        <div class="node-circle"></div>
+                        <div class="node-label">Quarter</div>
+                    </div>
+                    <div class="stage-progress-node">
+                        <div class="node-circle"></div>
+                        <div class="node-label">Semi</div>
+                    </div>
+                    <div class="stage-progress-node">
+                        <div class="node-circle"></div>
+                        <div class="node-label">Final</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rankings Card -->
+            <section class="rankings-card">
+                <div class="rankings-header">
+                    <div class="rankings-header-rank">Rank</div>
+                    <div class="rankings-header-player">Player</div>
+                    <div class="rankings-header-xp">Daily XP</div>
+                </div>
+
+                <!-- Scrollable Rankings List -->
+                <div class="rankings-list" id="rankings-list">
+                    <!-- Dynamic rows will be inserted here -->
+                </div>
+
+                <!-- Card Loading Spinner Overlay -->
+                <div class="loading-overlay" id="loading-overlay">
+                    <div class="spinner"></div>
+                    <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">Fetching Rankings...</div>
+                </div>
+            </section>
+
+            <!-- Sticky Footer for Current User (if rank is > 3) -->
+            <div class="sticky-footer" id="sticky-user-footer" style="display: none;">
+                <!-- Filled dynamically if player is rank > 3 -->
+            </div>
+
+            <!-- Dev Panel -->
+            <div id="admin-dev-panel" style="display: none; background: rgba(30, 41, 59, 0.95); border: 2px solid red; border-radius: 16px; padding: 12px 16px; text-align: center; margin-top: 0.5rem; flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);">
+                <p style="color: red; font-size: 10px; margin-top: 0; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">DEV TOOLS</p>
+                <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+                    <button id="dev-add-xp" style="padding: 8px 12px; background: #22c55e; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85rem; flex: 1;">+500 XP</button>
+                    <button id="dev-sub-xp" style="padding: 8px 12px; background: #ef4444; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85rem; flex: 1;">-500 XP</button>
+                    <button id="dev-force-reset" style="padding: 8px 12px; background: #eab308; border: none; border-radius: 8px; color: black; font-weight: bold; cursor: pointer; font-size: 0.85rem; flex: 2;">FORCE END ROUND</button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Unlock Overlay -->
+        <div id="unlock-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 30000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
+            <h1 id="unlock-title" style="color: #ffd700; text-transform: uppercase; margin-bottom: 10px; text-shadow: 2px 2px 5px #000; font-family: 'Outfit', sans-serif; font-weight: 800;">Congratulations!</h1>
+            <p id="unlock-desc" style="color: white; font-size: 1.2rem; margin-bottom: 20px; font-family: 'Outfit', sans-serif;">You have qualified for the next stage!</p>
+            <img id="unlock-avatar-img" src="../../assets/locker-room/images/avatars/celebrate.png" style="width: 200px; height: auto; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));">
+            <button onclick="document.getElementById('unlock-overlay').style.display='none';" style="background: #38ef7d; color: black; font-weight: bold; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-family: 'Outfit', sans-serif;">Awesome</button>
+        </div>
+    </div>
+
+    <!-- Load game state service -->
+    <script src="../../services/gameState.js?v=2"></script>
+    
+    <!-- Leaderboard logic -->
+    <script>
+        // Mapping of common countries to flag emojis
+        function getFlagEmoji(countryName) {
+            if (!countryName) return '⚽';
+            const code = countryName.trim().toLowerCase();
+            const flags = {
+                'afghanistan': '🇦🇫', 'albania': '🇦🇱', 'algeria': '🇩🇿', 'andorra': '🇦🇩', 'angola': '🇦🇴',
+                'argentina': '🇦🇷', 'armenia': '🇦🇲', 'australia': '🇦🇺', 'austria': '🇦🇹', 'azerbaijan': '🇦🇿',
+                'bahamas': '🇧🇸', 'bahrain': '🇧🇭', 'bangladesh': '🇧🇩', 'barbados': '🇧🇧', 'belarus': '🇧🇾',
+                'belgium': '🇧🇪', 'belize': '🇧🇿', 'benin': '🇧🇯', 'bhutan': '🇧🇹', 'bolivia': '🇧🇴',
+                'brazil': '🇧🇷', 'brunei': '🇧🇳', 'bulgaria': '🇧🇬', 'cambodia': '🇰🇭', 'cameroon': '🇨🇲',
+                'canada': '🇨🇦', 'chile': '🇨🇱', 'china': '🇨🇳', 'colombia': '🇨🇴', 'costa rica': '🇨🇷',
+                'croatia': '🇭🇷', 'cuba': '🇨🇺', 'cyprus': '🇨🇾', 'czechia': '🇨🇿', 'denmark': '🇩🇰',
+                'ecuador': '🇪🇨', 'egypt': '🇪🇬', 'el salvador': '🇸🇻', 'estonia': '🇪🇪', 'ethiopia': '🇪🇹',
+                'fiji': '🇫🇯', 'finland': '🇫🇮', 'france': '🇫🇷', 'georgia': '🇬🇪', 'germany': '🇩🇪',
+                'ghana': '🇬🇭', 'greece': '🇬🇷', 'guatemala': '🇬🇹', 'haiti': '🇭🇹', 'honduras': '🇭🇳',
+                'hungary': '🇭🇺', 'iceland': '🇮🇸', 'india': '🇮🇳', 'indonesia': '🇮🇩', 'iran': '🇮🇷',
+                'iraq': '🇮🇶', 'ireland': '🇮🇪', 'israel': '🇮🇱', 'italy': '🇮🇹', 'jamaica': '🇯🇲',
+                'japan': '🇯🇵', 'jordan': '🇯🇴', 'kazakhstan': '🇰🇿', 'kenya': '🇰🇪', 'kuwait': '🇰🇼',
+                'latvia': '🇱🇻', 'lebanon': '🇱🇧', 'liberia': '🇱🇷', 'libya': '🇱🇾', 'lithuania': '🇱🇹',
+                'luxembourg': '🇱🇺', 'malaysia': '🇲🇾', 'maldives': '🇲🇻', 'mali': '🇲🇱', 'malta': '🇲🇹',
+                'mexico': '🇲🇽', 'monaco': '🇲🇨', 'mongolia': '🇲🇳', 'morocco': '🇲🇦', 'nepal': '🇳🇵',
+                'netherlands': '🇳🇱', 'new zealand': '🇳🇿', 'nicaragua': '🇳🇮', 'nigeria': '🇳🇬',
+                'norway': '🇳🇴', 'oman': '🇴🇲', 'pakistan': '🇵🇰', 'panama': '🇵🇦', 'paraguay': '🇵🇾',
+                'peru': '🇵🇪', 'philippines': '🇵🇭', 'poland': '🇵🇱', 'portugal': '🇵🇹', 'qatar': '🇶🇦',
+                'romania': '🇷🇴', 'russia': '🇷🇺', 'saudi arabia': '🇸🇦', 'senegal': '🇸🇳', 'serbia': '🇷🇸',
+                'singapore': '🇸🇬', 'slovakia': '🇸🇰', 'slovenia': '🇸🇮', 'south africa': '🇿🇦',
+                'south korea': '🇰🇷', 'spain': '🇪🇸', 'sri lanka': '🇱🇰', 'sweden': '🇸🇪', 'switzerland': '🇨🇭',
+                'syria': '🇸🇾', 'thailand': '🇹🇭', 'tunisia': '🇹🇳', 'turkey': '🇹🇷', 'ukraine': '🇺🇦',
+                'united arab emirates': '🇦🇪', 'united kingdom': '🇬🇧', 'united states of america': '🇺🇸',
+                'united states': '🇺🇸', 'uruguay': '🇺🇾', 'uzbekistan': '🇺🇿', 'venezuela': '🇻🇪',
+                'vietnam': '🇻🇳', 'zambia': '🇿🇲', 'zimbabwe': '🇿🇼'
+            };
+            return flags[code] || '⚽';
+        }
+
+        // Generate initials for avatar fallback
+        function getInitials(name) {
+            if (!name) return '⚽';
+            const clean = name.trim().replace(/[^a-zA-Z0-9\s]/g, '');
+            if (!clean) return '⚽';
+            const parts = clean.split(/\s+/);
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return clean.substring(0, 2).toUpperCase();
+        }
+
+        // Get avatar gradient styling
+        function getAvatarBg(name) {
+            const colors = [
+                'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)',
+                'linear-gradient(135deg, #c3cfe2 0%, #c3cfe2 100%)',
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
+            ];
+            // Simple hash function
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const index = Math.abs(hash) % colors.length;
+            return colors[index];
+        }
+
+        // Initialize script logic
+        let lastDateStr = new Date().toDateString();
+        
+        function updateCountdownTimer() {
+            const now = new Date();
+            const currentDateStr = now.toDateString();
+            
+            // If the date changed, it's a new day!
+            if (currentDateStr !== lastDateStr) {
+                lastDateStr = currentDateStr;
+                if (window.checkTournamentReset) {
+                    window.checkTournamentReset();
+                }
+                if (typeof initLeaderboard === 'function') {
+                    initLeaderboard();
+                }
+            }
+            
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            const diffMs = tomorrow.getTime() - now.getTime();
+            const diffSecs = Math.max(0, Math.floor(diffMs / 1000));
+            
+            const hours = Math.floor(diffSecs / 3600);
+            const minutes = Math.floor((diffSecs % 3600) / 60);
+            const seconds = diffSecs % 60;
+            
+            const timeStr = [
+                hours.toString().padStart(2, '0'),
+                minutes.toString().padStart(2, '0'),
+                seconds.toString().padStart(2, '0')
+            ].join(':');
+            
+            const timerEl = document.getElementById('tournament-timer');
+            if (timerEl) {
+                timerEl.innerText = `Ends in: ${timeStr}`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.GK_State_Hydrated) {
+                initLeaderboard();
+            } else {
+                window.addEventListener('gk_state_updated', initLeaderboard, { once: true });
+                // Safe absolute fallback if hydration takes too long
+                setTimeout(() => {
+                    initLeaderboard();
+                }, 4000);
+            }
+            
+            // Start the countdown timer
+            updateCountdownTimer();
+            setInterval(updateCountdownTimer, 1000);
+
+            // Attach event listeners to dev panel buttons
+            const addXpBtn = document.getElementById('dev-add-xp');
+            if (addXpBtn) {
+                addXpBtn.addEventListener('click', () => {
+                    if (!window.GK_State) window.GK_State = {};
+                    if (!window.GK_State.player) window.GK_State.player = {};
+                    window.GK_State.player.tournamentDailyXP = (window.GK_State.player.tournamentDailyXP || 0) + 500;
+                    if (window.saveGameState) window.saveGameState(true);
+                    initLeaderboard();
+                });
+            }
+
+            const subXpBtn = document.getElementById('dev-sub-xp');
+            if (subXpBtn) {
+                subXpBtn.addEventListener('click', () => {
+                    if (!window.GK_State) window.GK_State = {};
+                    if (!window.GK_State.player) window.GK_State.player = {};
+                    window.GK_State.player.tournamentDailyXP = Math.max(0, (window.GK_State.player.tournamentDailyXP || 0) - 500);
+                    if (window.saveGameState) window.saveGameState(true);
+                    initLeaderboard();
+                });
+            }
+
+            const forceResetBtn = document.getElementById('dev-force-reset');
+            if (forceResetBtn) {
+                forceResetBtn.addEventListener('click', () => {
+                    if (window.checkTournamentReset) {
+                        window.checkTournamentReset(true);
+                    }
+                    initLeaderboard();
+                });
+            }
+        });
+
+        function generateTournamentBots() {
+            if (!window.GK_State) window.GK_State = {};
+            if (!window.GK_State.player) window.GK_State.player = {};
+            
+            // Check if tournamentBots is empty or needs generation
+            if (window.GK_State.player.tournamentBots && window.GK_State.player.tournamentBots.length > 0) {
+                return; // Already generated
+            }
+
+            const stage = window.GK_State.player.tournamentStage || 1;
+            let botCount = 29;
+            if (stage === 1) botCount = 29;
+            else if (stage === 2) botCount = 15;
+            else if (stage === 3) botCount = 7;
+            else if (stage === 4) botCount = 3;
+            else if (stage === 5) botCount = 1;
+
+            // Calculate eliteTarget XP explicitly based on max level progress
+            let maxLevel = 1;
+            if (window.GK_State.player) {
+                const crossbarLvl = window.GK_State.player.crossbarLevel || 1;
+                const shootoutLvl = window.GK_State.player.shootoutLevel || 1;
+                const slalomLvl = window.GK_State.player.slalomLevel || 1;
+                maxLevel = Math.max(crossbarLvl, shootoutLvl, slalomLvl, 1);
+            }
+            
+            let perfectRunXP = maxLevel * 5;
+            let eliteTarget = perfectRunXP * 20;
+
+            const botNames = [
+                "Oliver", "Emma", "Liam", "Sophia", "Lucas", "Mia", "Noah", "Olivia", 
+                "Ethan", "Ava", "Mason", "Isabella", "Jack", "Zoe", "Leo", "Daniel", 
+                "Chloe", "Lily", "Arthur", "Thomas", "James", "Harper", "Aiden", "Ella", 
+                "Jackson", "Grace", "Scarlett", "Benjamin", "Aria", "Henry", "Wyatt", "Mila"
+            ];
+
+            const botCountries = [
+                "Australia", "Argentina", "Portugal", "Brazil", "France", "United Kingdom", 
+                "Norway", "Netherlands", "Egypt", "South Korea", "Japan", "Canada", 
+                "Germany", "Spain", "Italy", "United States", "Mexico", "New Zealand"
+            ];
+
+            // Shuffle names to ensure uniqueness
+            const shuffledNames = [...botNames].sort(() => Math.random() - 0.5);
+            const bots = [];
+
+            for (let i = 0; i < botCount; i++) {
+                // Determine tier distribution
+                let tier;
+                if (i < Math.max(1, Math.floor(botCount * 0.15))) {
+                    tier = 'top';
+                } else if (i < Math.max(2, Math.floor(botCount * 0.65))) {
+                    tier = 'mid';
+                } else {
+                    tier = 'bottom';
+                }
+
+                let minPercent, maxPercent;
+                if (tier === 'top') {
+                    minPercent = 0.90;
+                    maxPercent = 1.05;
+                } else if (tier === 'mid') {
+                    minPercent = 0.60;
+                    maxPercent = 0.85;
+                } else {
+                    minPercent = 0.30;
+                    maxPercent = 0.55;
+                }
+
+                const percent = Math.random() * (maxPercent - minPercent) + minPercent;
+                const targetXP = Math.floor(eliteTarget * percent);
+
+                const name = shuffledNames[i % shuffledNames.length];
+                const country = botCountries[Math.floor(Math.random() * botCountries.length)];
+
+                bots.push({
+                    uid: 'bot_' + i + '_' + Math.random().toString(36).substr(2, 5),
+                    name: name,
+                    country: country,
+                    targetXP: targetXP
+                });
+            }
+
+            window.GK_State.player.tournamentBots = bots;
+            if (window.saveGameState) {
+                window.saveGameState(true);
+            }
+        }
+
+        function calculateCurrentBotScores() {
+            const now = new Date();
+            const fraction = (now.getHours() + now.getMinutes() / 60) / 24;
+            const bots = window.GK_State?.player?.tournamentBots || [];
+            
+            return bots.map(bot => {
+                return {
+                    uid: bot.uid,
+                    name: bot.name,
+                    country: bot.country,
+                    xp: Math.floor(bot.targetXP * fraction)
+                };
+            });
+        }
+
+        function updateStageProgressUI() {
+            const currentStage = window.GK_State?.player?.tournamentStage || 1;
+            const nodes = document.querySelectorAll('#stage-nodes-container .stage-progress-node');
+            
+            nodes.forEach((node, index) => {
+                const stageNum = index + 1;
+                node.classList.remove('active', 'completed');
+                
+                if (stageNum < currentStage) {
+                    node.classList.add('completed');
+                } else if (stageNum === currentStage) {
+                    node.classList.add('active');
+                }
+            });
+        }
+
+        async function initLeaderboard() {
+            updateStageProgressUI();
+
+            // Check for promotion pending overlay
+            if (window.GK_State?.player?.tournamentPromotionPending) {
+                const promo = window.GK_State.player.tournamentPromotionPending;
+                
+                const titleEl = document.getElementById('unlock-title');
+                const descEl = document.getElementById('unlock-desc');
+                const avatarImg = document.getElementById('unlock-avatar-img');
+                const btnEl = document.querySelector('#unlock-overlay button');
+                const overlay = document.getElementById('unlock-overlay');
+                
+                if (overlay) {
+                    if (titleEl) {
+                        titleEl.innerText = promo.wonCup ? "🏆 CHAMPION!" : "CONGRATULATIONS!";
+                        titleEl.style.color = "#ffd700"; // Gold highlight
+                    }
+                    
+                    let stageNames = ["Group Stage", "Knockout Stage", "Quarter Final", "Semi Final", "Final"];
+                    let newStageName = stageNames[promo.newStage - 1] || "Group Stage";
+                    
+                    if (descEl) {
+                        if (promo.wonCup) {
+                            descEl.innerHTML = `You won the Tournament Cup!<br>Stage 5 Completed.<br><span style="color: #ffd700; font-weight: bold;">+${promo.rewardXP} XP & +${promo.rewardTokens} Tokens</span>`;
+                        } else {
+                            descEl.innerHTML = `You qualified for the next stage:<br><strong style="color: #ffd700;">${newStageName}</strong>!<br>Received: +${promo.rewardXP} XP & +${promo.rewardTokens} Tokens`;
+                        }
+                    }
+                    
+                    if (avatarImg && typeof window.getCelebrateAvatarUrl === 'function') {
+                        avatarImg.src = window.getCelebrateAvatarUrl();
+                    }
+                    
+                    if (btnEl) {
+                        btnEl.innerText = "Awesome";
+                        btnEl.style.background = "#38ef7d";
+                        btnEl.style.color = "black";
+                    }
+                    
+                    overlay.style.display = 'flex';
+                }
+                
+                // Clear the pending promotion flag
+                delete window.GK_State.player.tournamentPromotionPending;
+                if (window.saveGameState) {
+                    window.saveGameState(true);
+                }
+            }
+
+            // Check for demotion pending overlay
+            if (window.GK_State?.player?.tournamentDemotionPending) {
+                const demo = window.GK_State.player.tournamentDemotionPending;
+                
+                const titleEl = document.getElementById('unlock-title');
+                const descEl = document.getElementById('unlock-desc');
+                const avatarImg = document.getElementById('unlock-avatar-img');
+                const btnEl = document.querySelector('#unlock-overlay button');
+                const overlay = document.getElementById('unlock-overlay');
+                
+                if (overlay) {
+                    if (titleEl) {
+                        titleEl.innerText = "ROUND OVER";
+                        titleEl.style.color = "#ff4757"; // Red/Demoted highlight
+                    }
+                    
+                    if (descEl) {
+                        descEl.innerHTML = `You finished rank <span style="color: #ff4757; font-weight: bold;">#${demo.playerRank}</span>.<br>Demoted to Stage 1.<br>Try again today!`;
+                    }
+                    
+                    if (avatarImg && typeof window.getBackAvatarUrl === 'function') {
+                        avatarImg.src = window.getBackAvatarUrl();
+                    }
+                    
+                    if (btnEl) {
+                        btnEl.innerText = "Try Again";
+                        btnEl.style.background = "#ff4757";
+                        btnEl.style.color = "#ffffff";
+                    }
+                    
+                    overlay.style.display = 'flex';
+                }
+                
+                // Clear the pending demotion flag
+                delete window.GK_State.player.tournamentDemotionPending;
+                if (window.saveGameState) {
+                    window.saveGameState(true);
+                }
+            }
+
+            // Auth check for dev panel
+            const devEmail = window.GK_State?.player?.email || window.GK_State?.profile?.email || (window.GK_FirebaseAuth?.currentUser?.email);
+            const isDevUser = devEmail === 'yasheen.sewn@gmail.com' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const devPanel = document.getElementById('admin-dev-panel');
+            if (devPanel) {
+                devPanel.style.display = isDevUser ? 'block' : 'none';
+            }
+
+            const isGuest = localStorage.getItem('gk_is_guest') === 'true';
+            const statusBanner = document.getElementById('status-banner');
+            const statusText = document.getElementById('status-text');
+            const loadingOverlay = document.getElementById('loading-overlay');
+
+            const currentUid = localStorage.getItem('gk_player_id') || 'guest';
+            const currentXp = window.GK_State?.player?.tournamentDailyXP || 0;
+            const currentName = window.GK_State?.profile?.["avatar name"] || window.GK_State?.player?.name || 'Guest Player';
+            
+            let currentCountry = window.GK_State?.profile?.country;
+            if (!currentCountry) {
+                try {
+                    const localProfile = JSON.parse(localStorage.getItem('gk_user_profile'));
+                    currentCountry = localProfile?.country;
+                } catch(e) {}
+            }
+            if (!currentCountry) {
+                currentCountry = 'Australia';
+            }
+
+            if (isGuest) {
+                statusText.innerText = "Guest Mode: Showing local tournament rankings";
+                statusBanner.style.display = "flex";
+            } else {
+                statusBanner.style.display = "none";
+            }
+
+            // Ensure bots are generated
+            generateTournamentBots();
+
+            // Calculate current scores based on time of day
+            const botPlayers = calculateCurrentBotScores();
+
+            // Add the current user to the leaderboard data
+            let leaderboardData = [...botPlayers];
+            
+            // Check if current user is already in the list
+            const userIndex = leaderboardData.findIndex(p => p.uid === currentUid);
+            if (userIndex !== -1) {
+                leaderboardData[userIndex].xp = currentXp;
+                leaderboardData[userIndex].isCurrentUser = true;
+                leaderboardData[userIndex].name = currentName;
+                leaderboardData[userIndex].country = currentCountry;
+            } else {
+                leaderboardData.push({
+                    uid: currentUid,
+                    name: currentName,
+                    xp: currentXp,
+                    country: currentCountry,
+                    isCurrentUser: true
+                });
+            }
+
+            // Sort descending by XP
+            leaderboardData.sort((a, b) => b.xp - a.xp);
+
+            renderUI(leaderboardData, currentUid);
+            loadingOverlay.style.display = "none";
+        }
+
+        function renderUI(data, currentUid) {
+            const listContainer = document.getElementById('rankings-list');
+            const stickyFooter = document.getElementById('sticky-user-footer');
+            
+            // Reset containers
+            listContainer.innerHTML = '';
+            stickyFooter.style.display = 'none';
+
+            let currentUserRank = -1;
+            let currentUserData = null;
+
+            const stage = window.GK_State?.player?.tournamentStage || 1;
+            let promotionCutoff = 10;
+            if (stage === 1) promotionCutoff = 10;
+            else if (stage === 2) promotionCutoff = 8;
+            else if (stage === 3) promotionCutoff = 4;
+            else if (stage === 4) promotionCutoff = 2;
+            else if (stage === 5) promotionCutoff = 1;
+
+            data.forEach((player, index) => {
+                const rank = index + 1;
+
+                if (player.isCurrentUser) {
+                    currentUserRank = rank;
+                    currentUserData = player;
+                }
+
+                // If this is an out of bounds user (only added for footer context), don't render in lists
+                if (player.isOutofBounds) return;
+
+                // Create list row for all ranks
+                const row = document.createElement('div');
+                const isPromo = rank <= promotionCutoff;
+                row.className = `rank-row${player.isCurrentUser ? ' current-user' : ''}${isPromo ? ' in-promotion-zone' : ''}`;
+                
+                const countryText = player.country ? `${getFlagEmoji(player.country)} ${player.country}` : '⚽ Player';
+                
+                row.innerHTML = `
+                    <div class="rank-number">#${rank}</div>
+                    <div class="rank-avatar" style="background: ${getAvatarBg(player.name)}; color: #fff;">${getInitials(player.name)}</div>
+                    <div class="rank-info">
+                        <div class="rank-name">${player.name}${player.isCurrentUser ? ' <span class="you-tag">YOU</span>' : ''}</div>
+                        <div class="rank-country">${countryText}</div>
+                    </div>
+                    <div class="rank-xp">${player.xp.toLocaleString()}</div>
+                `;
+                
+                listContainer.appendChild(row);
+
+                // Append visual divider if rank exactly equals promotionCutoff and not the last item
+                if (rank === promotionCutoff && index < data.length - 1) {
+                    const divider = document.createElement('div');
+                    divider.style.cssText = "display: flex; align-items: center; text-align: center; margin: 15px 0; color: #10b981; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; width: 100%; font-family: 'Outfit', sans-serif;";
+                    divider.innerHTML = `
+                        <div style="flex: 1; border-bottom: 2px dashed #10b981; margin-right: 10px;"></div>
+                        PROMOTION ZONE ▲
+                        <div style="flex: 1; border-bottom: 2px dashed #10b981; margin-left: 10px;"></div>
+                    `;
+                    listContainer.appendChild(divider);
+                }
+            });
+
+            // Handle Sticky Footer for Current User
+            // Show it if: User is logged in/guest, has a valid rank, and is rank > 3 (so they might be scrolled out of view)
+            if (currentUserRank > 3 && currentUserData) {
+                const countryText = currentUserData.country ? `${getFlagEmoji(currentUserData.country)} ${currentUserData.country}` : '⚽ Player';
+                
+                stickyFooter.innerHTML = `
+                    <div class="rank-number">#${currentUserRank}</div>
+                    <div class="rank-avatar" style="background: ${getAvatarBg(currentUserData.name)}; color: #fff; margin-right: 12px;">${getInitials(currentUserData.name)}</div>
+                    <div class="rank-info">
+                        <div class="rank-name" style="color: #fff; font-weight: 800;">${currentUserData.name} <span class="you-tag">YOU</span></div>
+                        <div class="rank-country" style="color: var(--text-muted); font-size: 0.75rem;">${countryText}</div>
+                    </div>
+                    <div class="rank-xp" style="font-size: 1.05rem; font-weight: 800; color: var(--secondary); text-align: right; width: 80px;">${currentUserData.xp.toLocaleString()}</div>
+                `;
+                stickyFooter.style.display = 'flex';
+            }
+        }
+    </script>
+</body>
+</html>

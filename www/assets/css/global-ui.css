@@ -4,11 +4,15 @@
 }
 
 html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  overflow-x: hidden;
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
-      box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 input, textarea {

@@ -445,13 +445,17 @@ function startGame() {
                         localStorage.setItem('gk_shootout_max_level', highestUnlockedLevel);
                     }
                 }
-                let reward = currentLevel * 20;
+                let reward = currentLevel * 5;
                 
                 if (!window.GK_State) window.GK_State = {};
                 if (!window.GK_State.economy) window.GK_State.economy = { xp: 0, tokens: 0 };
 
                 window.GK_State.economy.xp += reward;
                 window.GK_State.economy.tokens += reward;
+
+                if (!window.GK_State.player) window.GK_State.player = {};
+                if (window.GK_State.player.tournamentDailyXP === undefined) window.GK_State.player.tournamentDailyXP = 0;
+                window.GK_State.player.tournamentDailyXP += reward;
 
                 if (typeof window.saveGameState === 'function') window.saveGameState(true);
 
@@ -895,11 +899,11 @@ function spawnSkyItem() {
             e.stopPropagation();
             cleanupItem();
             
-            if (window.addTokens) window.addTokens(50);
+            if (window.addTokens) window.addTokens(20);
             
             const floatText = document.createElement('div');
             floatText.classList.add('floating-token-text');
-            floatText.textContent = '+50 TOKENS';
+            floatText.textContent = '+20 TOKENS';
             floatText.style.left = `${e.clientX}px`;
             floatText.style.top = `${e.clientY}px`;
             document.body.appendChild(floatText);
@@ -984,11 +988,11 @@ function spawnExtraSkyItem() {
             e.stopPropagation();
             cleanupItem();
             
-            if (window.addTokens) window.addTokens(50);
+            if (window.addTokens) window.addTokens(20);
             
             const floatText = document.createElement('div');
             floatText.classList.add('floating-token-text');
-            floatText.textContent = '+50 TOKENS';
+            floatText.textContent = '+20 TOKENS';
             floatText.style.left = `${e.clientX}px`;
             floatText.style.top = `${e.clientY}px`;
             document.body.appendChild(floatText);
@@ -1170,13 +1174,17 @@ function checkOpponentDeath(targetObj) {
                     localStorage.setItem('gk_shootout_max_level', highestUnlockedLevel);
                 }
             }
-            let reward = currentLevel * 20;
+            let reward = currentLevel * 5;
             
             if (!window.GK_State) window.GK_State = {};
             if (!window.GK_State.economy) window.GK_State.economy = { xp: 0, tokens: 0 };
 
             window.GK_State.economy.xp += reward;
             window.GK_State.economy.tokens += reward;
+
+            if (!window.GK_State.player) window.GK_State.player = {};
+            if (window.GK_State.player.tournamentDailyXP === undefined) window.GK_State.player.tournamentDailyXP = 0;
+            window.GK_State.player.tournamentDailyXP += reward;
 
             if (typeof window.saveGameState === 'function') window.saveGameState(true);
 
@@ -1945,3 +1953,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (typeof window.updateShootOutUI === 'function') window.updateShootOutUI();
 });
+
+// Intercept Android hardware back button
+if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', () => {
+        window.location.href = '../../menu.html';
+    });
+}

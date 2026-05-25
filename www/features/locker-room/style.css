@@ -581,3 +581,11 @@ html, body {
     display: flex;
     justify-content: center;
 }
+
+/* Android devices with active software navigation bar */
+body.android-with-nav .drawer-actions {
+    padding-bottom: calc(15px + var(--android-nav-bottom, 0px)) !important;
+}
+body.android-with-nav .recovery-actions {
+    padding-bottom: var(--android-nav-bottom, 0px) !important;
+}

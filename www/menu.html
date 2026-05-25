@@ -64,17 +64,41 @@
         .menu-buttons {
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 12px;
             margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px; /* Step 6: give buttons breathing room and drop shadow space */
+        }
+
+        .menu-col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 2px;
+            box-sizing: border-box;
         }
 
         .menu-buttons button {
             background: linear-gradient(135deg, rgba(255, 153, 0, 0.8), rgba(255, 85, 0, 0.8));
             backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             color: white;
             border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 10px;
-            padding: 12px 16px;
+            border-radius: 12px !important; /* Step 3: Explicitly declare border-radius on all corners */
+            border-top-left-radius: 12px !important;
+            border-bottom-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+            border-bottom-right-radius: 12px !important;
+            padding: 12px 6px;
             font-size: 0.95rem;
             font-weight: 800;
             text-transform: uppercase;
@@ -83,14 +107,34 @@
             transition: all 0.1s ease-in-out;
             font-family: 'Arial', sans-serif;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 60px;
+            box-sizing: border-box !important; /* Step 5: Ensure box-sizing: border-box is applied */
+            line-height: 1.2;
+            width: 100%;
+            margin: 0 !important; /* Step 4: Remove any margins */
+            overflow: hidden; /* Ensure rounded corners are not clipped/missed by backdrop-filter */
+            background-clip: padding-box;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
         }
 
-        .menu-buttons button.btn-locker, .menu-buttons button.btn-recovery {
+        .menu-buttons button.btn-locker, 
+        .menu-buttons button.btn-recovery, 
+        .menu-buttons button.btn-leaderboard {
             background: linear-gradient(135deg, rgba(28, 181, 224, 0.8), rgba(0, 0, 70, 0.8));
-        }
-        
-        .menu-buttons button.btn-locker {
-            margin-top: 10px;
+            border-radius: 12px !important; /* Step 3: Force rounded corners on all blue buttons */
+            border-top-left-radius: 12px !important;
+            border-bottom-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+            border-bottom-right-radius: 12px !important;
+            box-sizing: border-box !important; /* Step 5: Ensure box-sizing is applied */
+            margin: 0 !important; /* Step 4: Remove any margins */
+            overflow: hidden !important;
+            background-clip: padding-box !important;
         }
 
         .menu-buttons button:active {
@@ -122,13 +166,20 @@
                 <!-- Logo baked into background -->
             </div>
             <div class="menu-buttons">
-                <h2 style="color: rgba(255,255,255,0.9); text-align: center; font-family: sans-serif; text-transform: uppercase; letter-spacing: 4px; font-size: 1rem; margin-top: 0; margin-bottom: 15px; padding: 8px 20px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; align-self: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">MENU</h2>
-                <button onclick="window.location.href='games/crossbar-challenge/index.html'">Crossbar Challenge</button>
-                <button onclick="window.location.href='games/dribble-slalom/index.html'">Dribble Slalom</button>
-                <button id="btnShootOut" onclick="handleShootOutClick()">Shoot Out</button>
-                <button class="btn-locker" onclick="window.location.href='features/locker-room/index.html'">Locker Room</button>
-                <button class="btn-recovery" onclick="window.location.href='features/locker-room/index.html?action=recovery'">Stamina Regeneration</button>
-                <button onclick="performLogOut()" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; padding: 10px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); box-shadow: none; cursor: pointer;">Log Out</button>
+                <h2 style="color: rgba(255,255,255,0.9); text-align: center; font-family: sans-serif; text-transform: uppercase; letter-spacing: 4px; font-size: 1rem; margin-top: 0; margin-bottom: 15px; padding: 8px 20px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; align-self: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: fit-content;">MENU</h2>
+                <div class="menu-grid">
+                    <div class="menu-col">
+                        <button onclick="window.location.href='games/crossbar-challenge/index.html'">Crossbar Challenge</button>
+                        <button onclick="window.location.href='games/dribble-slalom/index.html'">Dribble Slalom</button>
+                        <button id="btnShootOut" onclick="handleShootOutClick()">Shoot Out</button>
+                    </div>
+                    <div class="menu-col">
+                        <button class="btn-locker" onclick="window.location.href='features/locker-room/index.html'">Locker Room</button>
+                        <button class="btn-recovery" onclick="window.location.href='features/locker-room/index.html?action=recovery'">Stamina Regeneration</button>
+                        <button class="btn-leaderboard" onclick="window.location.href='features/leaderboard/index.html'">Tournament</button>
+                    </div>
+                </div>
+                <button onclick="performLogOut()" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); font-size: 0.75rem; padding: 10px; margin-top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 15px); box-shadow: none; cursor: pointer; width: 100%;">Log Out</button>
             </div>
         </div>
         <button id="sound-toggle-btn" style="position: absolute; top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 20px); left: 20px; z-index: 10000; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white;">
@@ -475,8 +526,11 @@
                 const country = document.getElementById('settings-country').value;
                 
                 const profile = { dob, gender, country };
-                if (window.GK_State && window.GK_State.profile && window.GK_State.profile.email) {
-                    profile.email = window.GK_State.profile.email;
+                if (window.GK_State && window.GK_State.profile) {
+                    Object.assign(profile, window.GK_State.profile);
+                    profile.dob = dob;
+                    profile.gender = gender;
+                    profile.country = country;
                 }
                 localStorage.setItem('gk_user_profile', JSON.stringify(profile));
                 
@@ -561,8 +615,11 @@
             const gender = document.getElementById('popup-gender').value.trim() || '';
             const country = document.getElementById('popup-country').value.trim();
             const profile = { dob, gender, country };
-            if (window.GK_State && window.GK_State.profile && window.GK_State.profile.email) {
-                profile.email = window.GK_State.profile.email;
+            if (window.GK_State && window.GK_State.profile) {
+                Object.assign(profile, window.GK_State.profile);
+                profile.dob = dob;
+                profile.gender = gender;
+                profile.country = country;
             }
             localStorage.setItem('gk_user_profile', JSON.stringify(profile));
             
@@ -581,8 +638,8 @@
             const currentStr = localStorage.getItem('gk_user_profile');
             if (!currentStr) {
                 const profile = { dob: '', gender: '', country: '' };
-                if (window.GK_State && window.GK_State.profile && window.GK_State.profile.email) {
-                    profile.email = window.GK_State.profile.email;
+                if (window.GK_State && window.GK_State.profile) {
+                    Object.assign(profile, window.GK_State.profile);
                 }
                 localStorage.setItem('gk_user_profile', JSON.stringify(profile));
                 if (window.GK_State) {
@@ -598,10 +655,10 @@
             const xp = getPlayerXP();
             const devUnlock = document.getElementById('dev-unlock-all-games').checked;
             
-            if (xp >= 50 || devUnlock) {
+            if (xp >= 200 || devUnlock) {
                 window.location.href = 'games/shoot-out/index.html';
             } else {
-                showCustomAlert("LOCKED", "Shoot Out is locked. It will unlock at 50 XP.");
+                showCustomAlert("LOCKED", "Shoot Out is locked. It will unlock at 200 XP.");
             }
         }
     </script>
@@ -645,12 +702,15 @@
                 const currentXp = getPlayerXP();
                 const devUnlocked = devUnlockCheckbox.checked;
                 
-                if (currentXp >= 50 || devUnlocked) {
-                    shootOutBtn.innerText = "Shoot Out";
+                if (currentXp >= 200 || devUnlocked) {
+                    shootOutBtn.innerHTML = "Shoot Out";
                     shootOutBtn.style.opacity = "1";
                     shootOutBtn.style.background = "linear-gradient(135deg, rgba(255, 153, 0, 0.8), rgba(255, 85, 0, 0.8))";
                 } else {
-                    shootOutBtn.innerText = "🔒 Shoot Out (Unlocks at 50 XP)";
+                    shootOutBtn.innerHTML = '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; line-height: 1.1;">' +
+                                            '<div>🔒 Shoot Out</div>' +
+                                            '<div style="font-size: 0.55rem; font-weight: 800; margin-top: 2px; text-transform: uppercase;">(Unlocks at 200 XP)</div>' +
+                                            '</div>';
                     shootOutBtn.style.opacity = "0.7";
                     shootOutBtn.style.background = "linear-gradient(135deg, rgba(100, 100, 100, 0.8), rgba(50, 50, 50, 0.8))";
                 }
@@ -668,7 +728,7 @@
                 }
                 const hasSeenUnlock = window.GK_State?.notifications?.seenShootOutUnlock === true;
                 
-                if (currentXp >= 50 && !hasSeenUnlock) {
+                if (currentXp >= 200 && !hasSeenUnlock) {
                     let jumpSrc = 'assets/locker-room/images/avatars/jump.png';
                     const equippedOutfit = window.GK_State?.player?.equippedOutfitId || localStorage.getItem('gk_equipped_outfit') || 'beginner';
                     
@@ -694,8 +754,9 @@
                     if (localProfileStr) {
                         try {
                             const localProfile = JSON.parse(localProfileStr);
-                            if (window.GK_State && !window.GK_State.profile) {
-                                window.GK_State.profile = localProfile;
+                            if (window.GK_State) {
+                                window.GK_State.profile = window.GK_State.profile || {};
+                                window.GK_State.profile = Object.assign({}, localProfile, window.GK_State.profile);
                                 if (window.saveGameState) window.saveGameState();
                                 if (window.syncToCloud) window.syncToCloud();
                             }

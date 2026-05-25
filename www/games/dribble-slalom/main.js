@@ -43,6 +43,10 @@ let purchasedMuffs = false;
 const isMoveOwned = (key) => window.GK_State?.catalogues?.slalom?.moves?.[key]?.owned || false;
 
 window.showMessage = function(text, color = '#ff4757') {
+    if (window.showGKNotification && (text.toUpperCase().includes('NOT ENOUGH') || text.toUpperCase().includes('TOKENS') || text.toUpperCase().includes('XP'))) {
+        window.showGKNotification(text, true);
+        return;
+    }
     const msg = document.createElement('div');
     msg.textContent = text;
     msg.style.position = 'fixed';
@@ -631,6 +635,10 @@ function renderCones(level) {
 
         window.GK_State.economy.xp += xpGained;
         window.GK_State.economy.tokens += tokensGained;
+
+        if (!window.GK_State.player) window.GK_State.player = {};
+        if (window.GK_State.player.tournamentDailyXP === undefined) window.GK_State.player.tournamentDailyXP = 0;
+        window.GK_State.player.tournamentDailyXP += xpGained;
 
         if (typeof window.saveGameState === 'function') window.saveGameState(true);
 
@@ -1780,13 +1788,19 @@ function renderCones(level) {
               btn.style.cursor = 'default';
               textEl.textContent = "Purchased";
               textEl.style.color = "#aaa";
+              textEl.style.background = "#555";
+              textEl.style.cursor = "default";
+              textEl.style.opacity = "0.7";
           } else {
               btn.style.opacity = '1.0';
               btn.style.filter = 'none';
               btn.classList.remove('equipped');
               btn.style.cursor = 'pointer';
               textEl.textContent = "Purchase: 200 Tokens";
-              textEl.style.color = "#ffd700";
+              textEl.style.color = "#000";
+              textEl.style.background = "#ffd700";
+              textEl.style.cursor = "pointer";
+              textEl.style.opacity = "1.0";
           }
       };
 
@@ -2769,3 +2783,10 @@ function renderCones(level) {
       }
   }
 });
+
+// Intercept Android hardware back button
+if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', () => {
+        window.location.href = '../../menu.html';
+    });
+}
