@@ -10,6 +10,10 @@ const unlockedDisplayEl = document.getElementById('unlockedDisplay');
 
 const nextBtn = document.getElementById('nextBtn');
 const goAgainBtn = document.getElementById('goAgainBtn');
+const resultOverlay = document.getElementById('match-result-overlay');
+const resultText = document.getElementById('match-result-text');
+const xpRewardUI = document.getElementById('match-xp-reward');
+const playBtn = document.getElementById('play-again-btn');
 const levelSlider = document.getElementById('levelSlider');
 const levelDownBtn = document.getElementById('levelDownBtn');
 const levelUpBtn = document.getElementById('levelUpBtn');
@@ -1078,7 +1082,8 @@ function finishKick() {
 
 // Rule 2: Single-Match Progression Gate
 function evaluateProgression() {
-    if (matchScore >= 2) {
+    const won = matchScore >= 2;
+    if (won) {
         
         // --- ECONOMY REWARD LOGIC ---
         const xpEarned = currentLevel * 5;
@@ -1108,16 +1113,47 @@ function evaluateProgression() {
         if (globalXp) globalXp.innerText = window.GK_State.economy.xp;
         if (globalTokens) globalTokens.innerText = window.GK_State.economy.tokens;
         
-        // Show reward in the popup message
+        // Show reward in the popup overlay
+        resultText.textContent = "Match Won!";
+        
         let avatarUrl = window.getCelebrateAvatarUrl ? window.getCelebrateAvatarUrl() : '../../assets/locker-room/images/avatars/celebrate.png';
-        showMessage(`
-            <div style="position: absolute; top: -140px; left: 50%; transform: translateX(-50%); width: 100vw;">
-                <div style="font-size: 2.2rem; font-weight: 900; text-transform: uppercase; text-shadow: 2px 2px 4px #000; color: #38ef7d;">Match Won!</div>
-                <div style="font-size: 1.2rem; margin-top: 5px; color: #fff; text-shadow: 2px 2px 4px #000;">+${xpEarned} XP  |  +${tokensEarned} Tokens</div>
-            </div>
-            <img src="${avatarUrl}" style="position: absolute; top: 120px; left: 50%; transform: translateX(-50%); max-height: 380px; width: auto; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); pointer-events: none;">
-        `, 'transparent');
-        // ----------------------------
+        let avatarImg = document.getElementById('crossbar-victory-avatar');
+        if (!avatarImg) {
+            avatarImg = document.createElement('img');
+            avatarImg.id = 'crossbar-victory-avatar';
+            resultText.parentNode.insertBefore(avatarImg, resultText);
+        }
+        avatarImg.src = avatarUrl;
+        avatarImg.style.cssText = 'max-height: 250px; width: auto; object-fit: contain; margin: 0 auto 15px auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); position: relative; z-index: 10; pointer-events: none;';
+        avatarImg.style.display = 'block';
+        
+        // Dynamic Flag background behind avatar
+        let flagImg = document.getElementById('crossbar-victory-flag');
+        if (!flagImg) {
+            flagImg = document.createElement('img');
+            flagImg.id = 'crossbar-victory-flag';
+            resultText.parentNode.insertBefore(flagImg, avatarImg);
+        }
+        let userCountry = '';
+        try {
+            const profileStr = localStorage.getItem('gk_user_profile');
+            if (profileStr) {
+                const profileObj = JSON.parse(profileStr);
+                userCountry = profileObj.country || '';
+            }
+        } catch (e) {}
+        const flagUrl = (typeof window.getCountryFlagUrl === 'function') ? window.getCountryFlagUrl(userCountry) : null;
+        if (flagUrl) {
+            flagImg.src = flagUrl;
+            flagImg.style.cssText = 'position: absolute; left: 50%; top: 120px; transform: translate(-50%, -50%); width: 220px; height: 150px; object-fit: cover; opacity: 0.85; z-index: 1; pointer-events: none; border-radius: 12px; filter: blur(1px);';
+            flagImg.style.display = 'block';
+        } else {
+            flagImg.style.display = 'none';
+        }
+
+        xpRewardUI.innerHTML = `+${xpEarned} XP<br><span style="color: #ffd700; font-size: 0.8em;">+${tokensEarned} Tokens</span>`;
+        xpRewardUI.style.display = 'block';
+        playBtn.textContent = 'Next Level';
         
         // Immediate Level up check (Best 2 out of 3)
         if (currentLevel < 100) {
@@ -1139,12 +1175,26 @@ function evaluateProgression() {
             }
         }
     } else {
-        showMessage('MATCH LOST!', '#ff4757');
+        resultText.textContent = "Match Lost";
+        let avatarImg = document.getElementById('crossbar-victory-avatar');
+        if (avatarImg) avatarImg.style.display = 'none';
+        let flagImg = document.getElementById('crossbar-victory-flag');
+        if (flagImg) flagImg.style.display = 'none';
+        xpRewardUI.style.display = 'none';
+        playBtn.textContent = 'Try Again';
     }
     
     updateScoreboard();
-    goAgainBtn.style.display = 'block';
-    goAgainBtn.style.marginTop = (matchScore >= 2) ? '-10px' : '150px';
+    resultOverlay.style.display = 'flex';
+    goAgainBtn.style.display = 'none';
+    
+    playBtn.onclick = () => {
+        resultOverlay.style.display = 'none';
+        resetMatchState();
+        hideMessage();
+        resetBall(true); // Force hazard reroll on new match
+        startShotClock();
+    };
 }
 
 // Button Events

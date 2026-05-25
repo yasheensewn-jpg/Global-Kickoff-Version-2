@@ -259,11 +259,16 @@
     </div>
     
     <!-- Unlock Overlay -->
-    <div id="unlock-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 30000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
-        <h1 style="color: #ffd700; text-transform: uppercase; margin-bottom: 10px; text-shadow: 2px 2px 5px #000;">Congratulations!</h1>
-        <p style="color: white; font-size: 1.2rem; margin-bottom: 20px;">You have unlocked the Shoot Out game!</p>
-        <img id="unlock-avatar-img" src="assets/locker-room/images/avatars/jump.png" style="width: 200px; height: auto; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));">
-        <button onclick="document.getElementById('unlock-overlay').style.display='none';" style="background: #38ef7d; color: black; font-weight: bold; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">Awesome</button>
+    <div id="unlock-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 30000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+        <div style="background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 2px solid #ffd700; padding: 30px 40px 30px 40px; border-radius: 20px; text-align: center; width: 85%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <h1 style="color: #ffd700; text-transform: uppercase; margin: 0 0 10px 0; font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 2.2rem; letter-spacing: 2px; text-shadow: none;">Congratulations!</h1>
+            <p style="color: white; font-size: 1.1rem; margin-bottom: 20px; font-family: 'Outfit', sans-serif;">You have unlocked the Shoot Out game!</p>
+            <div class="avatar-flag-wrapper" style="position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 30px;">
+                <img id="unlock-flag-img" src="" style="position: absolute; width: 220px; height: 150px; object-fit: cover; opacity: 0.85; z-index: 1; border-radius: 12px; filter: blur(1px); pointer-events: none;">
+                <img id="unlock-avatar-img" src="assets/locker-room/images/avatars/jump.png" style="width: 200px; height: auto; position: relative; z-index: 2; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));">
+            </div>
+            <button onclick="document.getElementById('unlock-overlay').style.display='none';" style="background: #38ef7d; color: black; font-weight: bold; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-family: 'Outfit', sans-serif;">Awesome</button>
+        </div>
     </div>
 
     <!-- Profile Completion Popup -->
@@ -741,6 +746,16 @@
                     }
                     
                     document.getElementById('unlock-avatar-img').src = jumpSrc;
+                    if (window.getCountryFlagUrl) {
+                        const flagUrl = window.getCountryFlagUrl();
+                        const flagImg = document.getElementById('unlock-flag-img');
+                        if (flagUrl) {
+                            flagImg.src = flagUrl;
+                            flagImg.style.display = 'block';
+                        } else {
+                            flagImg.style.display = 'none';
+                        }
+                    }
                     document.getElementById('unlock-overlay').style.display = 'flex';
                     
                     if (window.GK_State) {

@@ -82,7 +82,7 @@
             </div>
 
             <!-- Dev Panel -->
-            <div id="admin-dev-panel" style="display: none; background: rgba(30, 41, 59, 0.95); border: 2px solid red; border-radius: 16px; padding: 12px 16px; text-align: center; margin-top: 0.5rem; flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);">
+            <div id="admin-dev-panel" style="display: none !important; background: rgba(30, 41, 59, 0.95); border: 2px solid red; border-radius: 16px; padding: 12px 16px; text-align: center; margin-top: 0.5rem; flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);">
                 <p style="color: red; font-size: 10px; margin-top: 0; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">DEV TOOLS</p>
                 <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
                     <button id="dev-add-xp" style="padding: 8px 12px; background: #22c55e; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85rem; flex: 1;">+500 XP</button>
@@ -93,11 +93,16 @@
         </main>
         
         <!-- Unlock Overlay -->
-        <div id="unlock-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 30000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box;">
-            <h1 id="unlock-title" style="color: #ffd700; text-transform: uppercase; margin-bottom: 10px; text-shadow: 2px 2px 5px #000; font-family: 'Outfit', sans-serif; font-weight: 800;">Congratulations!</h1>
-            <p id="unlock-desc" style="color: white; font-size: 1.2rem; margin-bottom: 20px; font-family: 'Outfit', sans-serif;">You have qualified for the next stage!</p>
-            <img id="unlock-avatar-img" src="../../assets/locker-room/images/avatars/celebrate.png" style="width: 200px; height: auto; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));">
-            <button onclick="document.getElementById('unlock-overlay').style.display='none';" style="background: #38ef7d; color: black; font-weight: bold; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-family: 'Outfit', sans-serif;">Awesome</button>
+        <div id="unlock-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 30000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+            <div id="unlock-card-box" style="background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 2px solid #ffd700; padding: 30px 40px 30px 40px; border-radius: 20px; text-align: center; width: 85%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h1 id="unlock-title" style="color: #ffd700; text-transform: uppercase; margin: 0 0 10px 0; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 2.2rem; letter-spacing: 2px; text-shadow: none;">Congratulations!</h1>
+                <p id="unlock-desc" style="color: white; font-size: 1.1rem; margin-bottom: 20px; font-family: 'Outfit', sans-serif;">You have qualified for the next stage!</p>
+                <div class="avatar-flag-wrapper" style="position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 30px;">
+                    <img id="unlock-flag-img" src="" style="position: absolute; width: 220px; height: 150px; object-fit: cover; opacity: 0.85; z-index: 1; border-radius: 12px; filter: blur(1px); pointer-events: none;">
+                    <img id="unlock-avatar-img" src="../../assets/locker-room/images/avatars/celebrate.png" style="width: 200px; height: auto; position: relative; z-index: 2; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));">
+                </div>
+                <button onclick="document.getElementById('unlock-overlay').style.display='none';" style="background: #38ef7d; color: black; font-weight: bold; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-family: 'Outfit', sans-serif;">Awesome</button>
+            </div>
         </div>
     </div>
 
@@ -382,10 +387,14 @@
         }
 
         async function initLeaderboard() {
+            if (typeof window.checkTournamentReset === 'function') {
+                window.checkTournamentReset();
+            }
             updateStageProgressUI();
 
             // Check for promotion pending overlay
-            if (window.GK_State?.player?.tournamentPromotionPending) {
+            if (window.GK_State?.player?.tournamentPromotionPending && !sessionStorage.getItem('hasSeenTourneyNotif')) {
+                sessionStorage.setItem('hasSeenTourneyNotif', 'true');
                 const promo = window.GK_State.player.tournamentPromotionPending;
                 
                 const titleEl = document.getElementById('unlock-title');
@@ -393,8 +402,30 @@
                 const avatarImg = document.getElementById('unlock-avatar-img');
                 const btnEl = document.querySelector('#unlock-overlay button');
                 const overlay = document.getElementById('unlock-overlay');
+                const cardBox = document.getElementById('unlock-card-box');
+                const flagImg = document.getElementById('unlock-flag-img');
                 
                 if (overlay) {
+                    if (cardBox) {
+                        cardBox.style.borderColor = "#ffd700";
+                    }
+                    if (flagImg && window.getCountryFlagUrl) {
+                        let userCountry = '';
+                        try {
+                            const profileStr = localStorage.getItem('gk_user_profile');
+                            if (profileStr) {
+                                const profileObj = JSON.parse(profileStr);
+                                userCountry = profileObj.country || '';
+                            }
+                        } catch (e) {}
+                        const flagUrl = window.getCountryFlagUrl(userCountry);
+                        if (flagUrl) {
+                            flagImg.src = flagUrl;
+                            flagImg.style.display = 'block';
+                        } else {
+                            flagImg.style.display = 'none';
+                        }
+                    }
                     if (titleEl) {
                         titleEl.innerText = promo.wonCup ? "🏆 CHAMPION!" : "CONGRATULATIONS!";
                         titleEl.style.color = "#ffd700"; // Gold highlight
@@ -423,16 +454,11 @@
                     
                     overlay.style.display = 'flex';
                 }
-                
-                // Clear the pending promotion flag
-                delete window.GK_State.player.tournamentPromotionPending;
-                if (window.saveGameState) {
-                    window.saveGameState(true);
-                }
             }
 
             // Check for demotion pending overlay
-            if (window.GK_State?.player?.tournamentDemotionPending) {
+            if (window.GK_State?.player?.tournamentDemotionPending && !sessionStorage.getItem('hasSeenTourneyNotif')) {
+                sessionStorage.setItem('hasSeenTourneyNotif', 'true');
                 const demo = window.GK_State.player.tournamentDemotionPending;
                 
                 const titleEl = document.getElementById('unlock-title');
@@ -440,8 +466,24 @@
                 const avatarImg = document.getElementById('unlock-avatar-img');
                 const btnEl = document.querySelector('#unlock-overlay button');
                 const overlay = document.getElementById('unlock-overlay');
+                const cardBox = document.getElementById('unlock-card-box');
+                const flagImg = document.getElementById('unlock-flag-img');
                 
                 if (overlay) {
+                    if (cardBox) {
+                        cardBox.style.borderColor = "#ff4757";
+                    }
+                    if (flagImg && window.getCountryFlagUrl) {
+                        let userCountry = '';
+                        try {
+                            const profileStr = localStorage.getItem('gk_user_profile');
+                            if (profileStr) {
+                                const profileObj = JSON.parse(profileStr);
+                                userCountry = profileObj.country || '';
+                            }
+                        } catch (e) {}
+                        flagImg.src = window.getCountryFlagUrl(userCountry);
+                    }
                     if (titleEl) {
                         titleEl.innerText = "ROUND OVER";
                         titleEl.style.color = "#ff4757"; // Red/Demoted highlight
@@ -463,20 +505,35 @@
                     
                     overlay.style.display = 'flex';
                 }
-                
-                // Clear the pending demotion flag
-                delete window.GK_State.player.tournamentDemotionPending;
-                if (window.saveGameState) {
-                    window.saveGameState(true);
-                }
             }
 
             // Auth check for dev panel
-            const devEmail = window.GK_State?.player?.email || window.GK_State?.profile?.email || (window.GK_FirebaseAuth?.currentUser?.email);
-            const isDevUser = devEmail === 'yasheen.sewn@gmail.com' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
             const devPanel = document.getElementById('admin-dev-panel');
             if (devPanel) {
-                devPanel.style.display = isDevUser ? 'block' : 'none';
+                // Ensure it's hidden initially
+                devPanel.style.setProperty('display', 'none', 'important');
+                
+                // Use dynamic import for Firebase Auth observer
+                import('https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js').then((authModule) => {
+                    const { onAuthStateChanged } = authModule;
+                    if (window.GK_FirebaseAuth) {
+                        onAuthStateChanged(window.GK_FirebaseAuth, user => {
+                            if (user && user.email === 'yasheen.sewn@gmail.com') {
+                                devPanel.style.setProperty('display', 'block', 'important');
+                            } else {
+                                devPanel.style.setProperty('display', 'none', 'important');
+                            }
+                        });
+                    }
+                }).catch(e => {
+                    // Fallback to strict synchronous check if import fails
+                    const devEmail = window.GK_State?.player?.email || window.GK_State?.profile?.email || (window.GK_FirebaseAuth?.currentUser?.email);
+                    if (devEmail === 'yasheen.sewn@gmail.com') {
+                        devPanel.style.setProperty('display', 'block', 'important');
+                    } else {
+                        devPanel.style.setProperty('display', 'none', 'important');
+                    }
+                });
             }
 
             const isGuest = localStorage.getItem('gk_is_guest') === 'true';

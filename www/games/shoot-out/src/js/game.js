@@ -478,7 +478,21 @@ function startGame() {
                 const overlayImageDiv = document.getElementById('overlay-image');
                 if (overlayImageDiv) {
                     let avatarUrl = window.getCelebrateAvatarUrl ? window.getCelebrateAvatarUrl() : '../../assets/locker-room/images/avatars/celebrate.png';
-                    overlayImageDiv.innerHTML = `<img src="${avatarUrl}" style="max-height: 280px; width: auto; object-fit: contain; margin: 0 auto 20px auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); position: relative; top: 140px;">`;
+                    let userCountry = '';
+                    try {
+                        const profileStr = localStorage.getItem('gk_user_profile');
+                        if (profileStr) {
+                            const profileObj = JSON.parse(profileStr);
+                            userCountry = profileObj.country || '';
+                        }
+                    } catch (e) {}
+                    const flagUrl = (typeof window.getCountryFlagUrl === 'function') ? window.getCountryFlagUrl(userCountry) : null;
+                    const flagHtml = flagUrl ? `<img src="${flagUrl}" style="position: absolute; left: 50%; top: calc(140px + 130px); transform: translate(-50%, -50%); width: 220px; height: 150px; object-fit: cover; opacity: 0.85; z-index: 1; pointer-events: none; border-radius: 12px; filter: blur(1px);">` : '';
+                    overlayImageDiv.style.position = 'relative';
+                    overlayImageDiv.innerHTML = `
+                        ${flagHtml}
+                        <img src="${avatarUrl}" style="position: relative; max-height: 280px; width: auto; object-fit: contain; margin: 0 auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); z-index: 2; pointer-events: none; top: 140px;">
+                    `;
                     overlayImageDiv.style.display = 'block';
                 }
                 
@@ -1207,7 +1221,21 @@ function checkOpponentDeath(targetObj) {
             const overlayImageDiv = document.getElementById('overlay-image');
             if (overlayImageDiv) {
                 let avatarUrl = window.getCelebrateAvatarUrl ? window.getCelebrateAvatarUrl() : '../../assets/locker-room/images/avatars/celebrate.png';
-                overlayImageDiv.innerHTML = `<img src="${avatarUrl}" style="max-height: 280px; width: auto; object-fit: contain; margin: 0 auto 20px auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); position: relative; top: 140px;">`;
+                let userCountry = '';
+                try {
+                    const profileStr = localStorage.getItem('gk_user_profile');
+                    if (profileStr) {
+                        const profileObj = JSON.parse(profileStr);
+                        userCountry = profileObj.country || '';
+                    }
+                } catch (e) {}
+                const flagUrl = (typeof window.getCountryFlagUrl === 'function') ? window.getCountryFlagUrl(userCountry) : null;
+                const flagHtml = flagUrl ? `<img src="${flagUrl}" style="position: absolute; left: 50%; top: calc(140px + 130px); transform: translate(-50%, -50%); width: 220px; height: 150px; object-fit: cover; opacity: 0.85; z-index: 1; pointer-events: none; border-radius: 12px; filter: blur(1px);">` : '';
+                overlayImageDiv.style.position = 'relative';
+                overlayImageDiv.innerHTML = `
+                    ${flagHtml}
+                    <img src="${avatarUrl}" style="position: relative; max-height: 280px; width: auto; object-fit: contain; margin: 0 auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); z-index: 2; pointer-events: none; top: 140px;">
+                `;
                 overlayImageDiv.style.display = 'block';
             }
             

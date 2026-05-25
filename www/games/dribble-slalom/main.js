@@ -591,11 +591,36 @@ function renderCones(level) {
             resultText.parentNode.insertBefore(avatarImg, resultText);
         }
         avatarImg.src = avatarUrl;
-        avatarImg.style.cssText = 'max-height: 260px; width: auto; object-fit: contain; margin: -40px auto 15px auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); position: relative; z-index: 10;';
+        avatarImg.style.cssText = 'max-height: 250px; width: auto; object-fit: contain; margin: 0 auto 15px auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); position: relative; z-index: 10; pointer-events: none;';
         avatarImg.style.display = 'block';
+        
+        let flagImg = document.getElementById('slalom-victory-flag');
+        if (!flagImg) {
+            flagImg = document.createElement('img');
+            flagImg.id = 'slalom-victory-flag';
+            resultText.parentNode.insertBefore(flagImg, avatarImg);
+        }
+        let userCountry = '';
+        try {
+            const profileStr = localStorage.getItem('gk_user_profile');
+            if (profileStr) {
+                const profileObj = JSON.parse(profileStr);
+                userCountry = profileObj.country || '';
+            }
+        } catch (e) {}
+        const flagUrl = (typeof window.getCountryFlagUrl === 'function') ? window.getCountryFlagUrl(userCountry) : null;
+        if (flagUrl) {
+            flagImg.src = flagUrl;
+            flagImg.style.cssText = 'position: absolute; left: 50%; top: 120px; transform: translate(-50%, -50%); width: 220px; height: 150px; object-fit: cover; opacity: 0.85; z-index: 1; pointer-events: none; border-radius: 12px; filter: blur(1px);';
+            flagImg.style.display = 'block';
+        } else {
+            flagImg.style.display = 'none';
+        }
     } else {
         let avatarImg = document.getElementById('slalom-victory-avatar');
         if (avatarImg) avatarImg.style.display = 'none';
+        let flagImg = document.getElementById('slalom-victory-flag');
+        if (flagImg) flagImg.style.display = 'none';
     }
     
     const xpRewardUI = document.getElementById('match-xp-reward');

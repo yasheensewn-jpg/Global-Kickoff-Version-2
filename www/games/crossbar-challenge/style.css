@@ -1083,3 +1083,68 @@ body {
 .is-web-app #ballShadow { bottom: 18%; }
 .is-web-app #goal { bottom: 45%; }
 .is-web-app #moveSelectorUI { bottom: 65px; }
+
+/* Unified Glassmorphic Victory Overlay */
+#match-result-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(15, 23, 42, 0.85); /* Premium dark slate transparent */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 2px solid #ffd700;
+    padding: 30px 40px 20px 40px;
+    border-radius: 20px;
+    text-align: center;
+    z-index: 100000;
+    pointer-events: auto;
+    width: 85%;
+    max-width: 380px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#match-result-overlay h2 {
+    font-size: 2.2rem;
+    color: #ffd700;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+    letter-spacing: 2px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    z-index: 10;
+}
+
+#match-xp-reward {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    z-index: 10;
+}
+
+#play-again-btn {
+    position: relative;
+    margin-top: 15px;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #111;
+    background: #ffd700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 10000;
+    text-transform: uppercase;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#play-again-btn:active {
+    transform: scale(0.95);
+}
+
