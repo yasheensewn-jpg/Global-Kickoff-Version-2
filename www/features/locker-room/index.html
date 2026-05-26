@@ -120,14 +120,11 @@
                         <!-- Items injected via JS -->
                     </div>
                 </div>
-                <div class="category-section collapsed" id="outfits">
-                    <h3 class="category-title toggle-header">
-                        <span>Outfits</span>
-                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                <div class="category-section" id="outfits-trigger" style="cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 0;">
+                    <h3 class="category-title" style="margin: 0; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span>Avatar Style</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </h3>
-                    <div class="carousel vertical-list collapsible-content" id="outfitsCarousel">
-                        <!-- Items injected via JS -->
-                    </div>
                 </div>
                 <div class="category-section collapsed" id="recoveryHub">
                     <h3 class="category-title toggle-header">
@@ -187,7 +184,28 @@
             </div>
 
         </aside>
+        <!-- Avatar Style Full-Screen Overlay -->
+        <div id="avatar-style-screen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 100; display: none; flex-direction: column; overflow-y: auto; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: calc(var(--ios-safe-top, env(safe-area-inset-top, 0px)) + 20px) 20px 20px 20px; background: rgba(0,0,0,0.8);">
+                <h2 style="margin: 0; color: white; font-family: 'Outfit', sans-serif;">Avatar Style</h2>
+                <button id="closeAvatarStyleBtn" style="background: none; border: none; color: #888; font-size: 24px; cursor: pointer; font-weight: bold; padding: 0; line-height: 1;">&times;</button>
+            </div>
+            
+            <div style="display: flex; justify-content: center; padding: 20px; background: #1a1a1a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1;">
+                <div class="gender-tabs" style="display: flex; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+                    <button class="gender-tab active" data-gender="male" style="flex: 1; padding: 10px 30px; border: none; background: #38ef7d; color: black; font-weight: bold; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s ease;">Male</button>
+                    <button class="gender-tab" data-gender="female" style="flex: 1; padding: 10px 30px; border: none; background: transparent; color: white; font-weight: bold; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s ease;">Female</button>
+                </div>
+            </div>
+            
+            <div style="flex: 1; overflow-y: auto; padding: 20px; box-sizing: border-box;">
+                <div id="outfitsCarousel" class="grid-layout">
+                    <!-- Items injected via JS -->
+                </div>
+            </div>
+        </div>
     </div>
+
     <!-- Drawer Overlay -->
     <div class="drawer-overlay" id="drawerOverlay" style="background: rgba(0,0,0,0.5); z-index: 9500;"></div>
 

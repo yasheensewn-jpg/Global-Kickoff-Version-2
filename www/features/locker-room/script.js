@@ -309,6 +309,40 @@ function initUI() {
             renderInventory(window.avatarAssets.outfits, elements.outfitsCarousel);
         });
     }
+
+    // Avatar Style Screen Logic
+    const outfitsTrigger = document.getElementById('outfits-trigger');
+    const avatarStyleScreen = document.getElementById('avatar-style-screen');
+    const closeAvatarStyleBtn = document.getElementById('closeAvatarStyleBtn');
+    
+    if (outfitsTrigger) {
+        outfitsTrigger.addEventListener('click', () => {
+            closeDrawer();
+            if (avatarStyleScreen) {
+                avatarStyleScreen.style.display = 'flex';
+            }
+        });
+    }
+
+    if (closeAvatarStyleBtn && avatarStyleScreen) {
+        closeAvatarStyleBtn.addEventListener('click', () => {
+            avatarStyleScreen.style.display = 'none';
+        });
+    }
+
+    const genderTabs = document.querySelectorAll('.gender-tab');
+    genderTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            genderTabs.forEach(t => {
+                t.classList.remove('active');
+                t.style.background = 'transparent';
+                t.style.color = 'white';
+            });
+            tab.classList.add('active');
+            tab.style.background = '#38ef7d';
+            tab.style.color = 'black';
+        });
+    });
 }
 
 function renderStats() {
