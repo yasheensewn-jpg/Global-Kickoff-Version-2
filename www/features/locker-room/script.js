@@ -69,7 +69,7 @@ window.avatarAssets = {
         },
         { 
             id: 'suit', 
-            name: 'Golden Suit', 
+            name: 'Suited up', 
             cost: 150,
             owned: false,
             equipped: false,
