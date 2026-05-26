@@ -87,6 +87,84 @@ window.avatarAssets = {
             ]
         }
     ],
+    femaleOutfits: [
+        { 
+            id: 'f_beginner', 
+            name: 'Beginner Gear', 
+            cost: 0,
+            owned: true,
+            equipped: true,
+            src: '../../assets/locker-room/images/avatars female/F1.Base Front.webp',
+            poses: [
+                { id: 'p0_front', name: 'Front View', src: '../../assets/locker-room/images/avatars female/F1.Base Front.webp' },
+                { id: 'p0_back', name: 'Back View', src: '../../assets/locker-room/images/avatars female/F1.Base Back.webp' },
+                { id: 'p_cel', name: 'Celebrate', src: '../../assets/locker-room/images/avatars female/F1.Base Celebrate1.webp' },
+                { id: 'p_jmp', name: 'Jump', src: '../../assets/locker-room/images/avatars female/F1.Base Celebrate2.webp' },
+                { id: 'p_downward_dog', name: 'Downward Dog', src: '../../assets/locker-room/images/avatars female/F1.Base Downward Dog.webp' },
+                { id: 'p_hamstring', name: 'Hamstring', src: '../../assets/locker-room/images/avatars female/F1.Base Hamstring.webp' },
+                { id: 'p_upward_dog', name: 'Upward Dog', src: '../../assets/locker-room/images/avatars female/F1.Base Upward dog.webp' },
+                { id: 'p_standing_thigh', name: 'Standing Thigh', src: '../../assets/locker-room/images/avatars female/F1.Base Standing Thigh.webp' },
+                { id: 'p_shoulder', name: 'Shoulder Stretch', src: '../../assets/locker-room/images/avatars female/F1.Base Standing shoulder.webp' }
+            ]
+        },
+        { 
+            id: 'f_competitive', 
+            name: 'Competitive Attire', 
+            cost: 150,
+            owned: false,
+            equipped: false,
+            src: '../../assets/locker-room/images/avatars female/F2.Competitive Front.webp',
+            poses: [
+                { id: 'p0_front', name: 'Front View', src: '../../assets/locker-room/images/avatars female/F2.Competitive Front.webp' },
+                { id: 'p0_back', name: 'Back View', src: '../../assets/locker-room/images/avatars female/F2.Competitive Back.webp' },
+                { id: 'p_cel', name: 'Celebrate', src: '../../assets/locker-room/images/avatars female/F2.Competitive Celebrate.webp' },
+                { id: 'p_jmp', name: 'Jump', src: '../../assets/locker-room/images/avatars female/F2.Competitive Celebrate2.webp' },
+                { id: 'p_downward_dog', name: 'Downward Dog', src: '../../assets/locker-room/images/avatars female/F2.Competitive Downward Dog.webp' },
+                { id: 'p_hamstring', name: 'Hamstring', src: '../../assets/locker-room/images/avatars female/F2.Competitive Hamstring.webp' },
+                { id: 'p_upward_dog', name: 'Upward Dog', src: '../../assets/locker-room/images/avatars female/F2.Competitive Upward Dog.webp' },
+                { id: 'p_standing_thigh', name: 'Standing Thigh', src: '../../assets/locker-room/images/avatars female/F2.Competitve Standing Thigh.webp' },
+                { id: 'p_shoulder', name: 'Shoulder Stretch', src: '../../assets/locker-room/images/avatars female/F2.Competitive Standing Shoulder.webp' }
+            ]
+        },
+        { 
+            id: 'f_beach', 
+            name: 'Beach Style', 
+            cost: 150,
+            owned: false,
+            equipped: false,
+            src: '../../assets/locker-room/images/avatars female/F3.Beach Front.webp',
+            poses: [
+                { id: 'p0_front', name: 'Front View', src: '../../assets/locker-room/images/avatars female/F3.Beach Front.webp' },
+                { id: 'p0_back', name: 'Back View', src: '../../assets/locker-room/images/avatars female/F3.Beach Back.webp' },
+                { id: 'p_cel', name: 'Celebrate', src: '../../assets/locker-room/images/avatars female/F3.Beach Celebrate.webp' },
+                { id: 'p_jmp', name: 'Jump', src: '../../assets/locker-room/images/avatars female/F3.Beach Celebrate2.webp' },
+                { id: 'p_downward_dog', name: 'Downward Dog', src: '../../assets/locker-room/images/avatars female/F3.Beach Downward Dog.webp' },
+                { id: 'p_hamstring', name: 'Hamstring', src: '../../assets/locker-room/images/avatars female/F3.Beach Hamstring.webp' },
+                { id: 'p_upward_dog', name: 'Upward Dog', src: '../../assets/locker-room/images/avatars female/F3.Beach Upward Dog.webp' },
+                { id: 'p_standing_thigh', name: 'Standing Thigh', src: '../../assets/locker-room/images/avatars female/F3.Beach Standing thigh.webp' },
+                { id: 'p_shoulder', name: 'Shoulder Stretch', src: '../../assets/locker-room/images/avatars female/F3.Beach Shoulder.webp' }
+            ]
+        },
+        { 
+            id: 'f_suit', 
+            name: 'Dressed up', 
+            cost: 150,
+            owned: false,
+            equipped: false,
+            src: '../../assets/locker-room/images/avatars female/F4.Dress Front.webp',
+            poses: [
+                { id: 'p0_front', name: 'Front View', src: '../../assets/locker-room/images/avatars female/F4.Dress Front.webp' },
+                { id: 'p0_back', name: 'Back View', src: '../../assets/locker-room/images/avatars female/F4.Dress Back.webp' },
+                { id: 'p_cel', name: 'Celebrate', src: '../../assets/locker-room/images/avatars female/F4.Dress Celebrate.webp' },
+                { id: 'p_jmp', name: 'Jump', src: '../../assets/locker-room/images/avatars female/F4.Dress Celebrate2.webp' },
+                { id: 'p_downward_dog', name: 'Downward Dog', src: '../../assets/locker-room/images/avatars female/F4.Dress Downward Dog.webp' },
+                { id: 'p_hamstring', name: 'Hamstring', src: '../../assets/locker-room/images/avatars female/F4.Dress Hamstring.webp' },
+                { id: 'p_upward_dog', name: 'Upward Dog', src: '../../assets/locker-room/images/avatars female/F4.Dress Upward Dog.webp' },
+                { id: 'p_standing_thigh', name: 'Standing Thigh', src: '../../assets/locker-room/images/avatars female/F4.Dress Standing Thigh.webp' },
+                { id: 'p_shoulder', name: 'Shoulder Stretch', src: '../../assets/locker-room/images/avatars female/F4.Dress Shoulder Stretch.webp' }
+            ]
+        }
+    ],
     specialGear: [
         { id: 'sg_crossbar', name: 'Crossbar Challenge', src: '../../assets/locker-room/images/avatars/crossbar_target.png' },
         { id: 'sg_dribble', name: 'Dribble Slalom', src: '../../assets/locker-room/images/avatars/dribble_cone.png' },
@@ -204,12 +282,19 @@ function initUI() {
     }
     
     const ownedOutfits = window.GK_State?.player?.ownedOutfits || ['beginner'];
+    let savedGender = localStorage.getItem('gk_equipped_gender') || window.GK_State?.player?.equippedGender || 'male';
+    
     window.avatarAssets.outfits.forEach(o => {
         if (ownedOutfits.includes(o.id) || o.id === 'beginner') o.owned = true;
-        o.equipped = (o.id === savedOutfitId);
+        o.equipped = (savedGender === 'male' && o.id === savedOutfitId);
+    });
+    window.avatarAssets.femaleOutfits.forEach(o => {
+        if (ownedOutfits.includes(o.id) || o.id === 'f_beginner') o.owned = true;
+        o.equipped = (savedGender === 'female' && o.id === savedOutfitId);
     });
     
-    activeOutfit = window.avatarAssets.outfits.find(o => o.id === savedOutfitId) || window.avatarAssets.outfits[0];
+    let outfitArray = savedGender === 'female' ? window.avatarAssets.femaleOutfits : window.avatarAssets.outfits;
+    activeOutfit = outfitArray.find(o => o.id === savedOutfitId) || outfitArray[0];
 
     // Set Default Hero Image
     if (elements.heroImage) {
@@ -266,7 +351,12 @@ function initUI() {
     renderMasterLockerRoom('moves', 'crossbar');
     renderMasterLockerRoom('gear', 'crossbar');
     if (elements.outfitsCarousel) {
-        renderInventory(window.avatarAssets.outfits, elements.outfitsCarousel);
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+            let savedGender = localStorage.getItem('gk_equipped_gender') || window.GK_State?.player?.equippedGender || 'male';
+            let outfitArray = savedGender === 'female' ? window.avatarAssets.femaleOutfits : window.avatarAssets.outfits;
+            renderInventory(outfitArray, elements.outfitsCarousel);
+        });
     }
     if (elements.posesCarousel) {
         renderInventory(activeOutfit.poses, elements.posesCarousel);
@@ -306,7 +396,10 @@ function initUI() {
     const devSelectAnyOutfit = document.getElementById('devSelectAnyOutfit');
     if (devSelectAnyOutfit) {
         devSelectAnyOutfit.addEventListener('change', () => {
-            renderInventory(window.avatarAssets.outfits, elements.outfitsCarousel);
+            const activeTab = document.querySelector('.gender-tab.active');
+            const gender = activeTab ? activeTab.dataset.gender : 'male';
+            let outfitArray = gender === 'female' ? window.avatarAssets.femaleOutfits : window.avatarAssets.outfits;
+            renderInventory(outfitArray, elements.outfitsCarousel);
         });
     }
 
@@ -331,6 +424,20 @@ function initUI() {
     }
 
     const genderTabs = document.querySelectorAll('.gender-tab');
+    let savedGenderUI = localStorage.getItem('gk_equipped_gender') || window.GK_State?.player?.equippedGender || 'male';
+    
+    genderTabs.forEach(tab => {
+        if (tab.dataset.gender === savedGenderUI) {
+            tab.classList.add('active');
+            tab.style.background = '#38ef7d';
+            tab.style.color = 'black';
+        } else {
+            tab.classList.remove('active');
+            tab.style.background = 'transparent';
+            tab.style.color = 'white';
+        }
+    });
+
     genderTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             genderTabs.forEach(t => {
@@ -341,6 +448,12 @@ function initUI() {
             tab.classList.add('active');
             tab.style.background = '#38ef7d';
             tab.style.color = 'black';
+            
+            let gender = tab.dataset.gender;
+            let outfitArray = gender === 'female' ? window.avatarAssets.femaleOutfits : window.avatarAssets.outfits;
+            if (elements.outfitsCarousel) {
+                renderInventory(outfitArray, elements.outfitsCarousel);
+            }
         });
     });
 }
@@ -429,7 +542,12 @@ window.addEventListener('gk_state_updated', () => {
 window.purchaseOutfit = function(outfitId, cost) {
     if (window.GK_State.economy.tokens >= cost) {
         window.GK_State.economy.tokens -= cost;
-        const outfit = window.avatarAssets.outfits.find(o => o.id === outfitId);
+        
+        const activeTab = document.querySelector('.gender-tab.active');
+        const gender = activeTab ? activeTab.dataset.gender : 'male';
+        let outfitArray = gender === 'female' ? window.avatarAssets.femaleOutfits : window.avatarAssets.outfits;
+        
+        const outfit = outfitArray.find(o => o.id === outfitId);
         if (outfit) outfit.owned = true;
         
         window.GK_State.player = window.GK_State.player || {};
@@ -440,7 +558,7 @@ window.purchaseOutfit = function(outfitId, cost) {
 
         if (typeof window.saveGameState === 'function') window.saveGameState(true);
         if (typeof window.syncToCloud === 'function') window.syncToCloud();
-        renderInventory(window.avatarAssets.outfits, elements.outfitsCarousel);
+        renderInventory(outfitArray, elements.outfitsCarousel);
         renderStats();
     } else {
         if (window.showGKNotification) {
@@ -454,14 +572,22 @@ window.purchaseOutfit = function(outfitId, cost) {
 window.equipOutfit = function(outfitId) {
     if (outfitId === 'basic') outfitId = 'beginner'; // Legacy failsafe
     
+    const activeTab = document.querySelector('.gender-tab.active');
+    const gender = activeTab ? activeTab.dataset.gender : 'male';
+    let outfitArray = gender === 'female' ? window.avatarAssets.femaleOutfits : window.avatarAssets.outfits;
+    
     // 1. HARD SAVE DIRECT TO LOCAL STORAGE
     localStorage.setItem('gk_equipped_outfit', outfitId);
+    localStorage.setItem('gk_equipped_gender', gender);
 
     // 2. Update visual assets
-    window.avatarAssets.outfits.forEach(o => o.equipped = (o.id === outfitId));
-    const selectedOutfit = window.avatarAssets.outfits.find(o => o.id === outfitId);
+    window.avatarAssets.outfits.forEach(o => o.equipped = false);
+    window.avatarAssets.femaleOutfits.forEach(o => o.equipped = false);
+    
+    const selectedOutfit = outfitArray.find(o => o.id === outfitId);
     
     if (selectedOutfit) {
+        selectedOutfit.equipped = true;
         activeOutfit = selectedOutfit;
         const heroImage = document.querySelector('.avatar-image');
         if (heroImage) {
@@ -484,17 +610,14 @@ window.equipOutfit = function(outfitId) {
     if (!window.GK_State) window.GK_State = {};
     if (!window.GK_State.player) window.GK_State.player = {};
     window.GK_State.player.equippedOutfitId = outfitId;
-    if (window.GK_State.catalogues && window.GK_State.catalogues.outfits) {
-        Object.keys(window.GK_State.catalogues.outfits).forEach(key => {
-            window.GK_State.catalogues.outfits[key].equipped = (key === outfitId);
-        });
-    }
+    window.GK_State.player.equippedGender = gender;
+    
     if (typeof window.saveGameState === 'function') window.saveGameState(true);
     if (typeof window.syncToCloud === 'function') window.syncToCloud();
     
     // 4. Force UI refresh
     const outfitsCarousel = document.getElementById('outfitsCarousel');
-    if (outfitsCarousel) renderInventory(window.avatarAssets.outfits, outfitsCarousel);
+    if (outfitsCarousel) renderInventory(outfitArray, outfitsCarousel);
 };
 
 function renderInventory(items, container) {
@@ -536,23 +659,41 @@ function renderInventory(items, container) {
             container.querySelectorAll('.inventory-item').forEach(el => el.classList.remove('selected'));
             itemEl.classList.add('selected');
             
-            isPreviewing = true;
+            let isOwned = true;
+            if (item.cost !== undefined) {
+                let unlockAll = document.getElementById('devSelectAnyOutfit') && document.getElementById('devSelectAnyOutfit').checked;
+                isOwned = item.owned || unlockAll;
+            }
+
+            if (item.poses && !isOwned) {
+                return; // Do not preview unowned outfits on the main screen
+            }
+
             if (elements.heroImage) {
                 elements.heroImage.src = item.src;
-            }
-            if (elements.prevPoseBtn) {
-                elements.prevPoseBtn.style.display = 'none'; // Dynamically hide the arrows
-            }
-            if (elements.nextPoseBtn) {
-                elements.nextPoseBtn.style.display = 'none';
             }
 
             // Outfit Swap Logic: Update poses if this item is an outfit
             if (item.poses) {
                 activeOutfit = item;
                 currentPoseIndex = 0; // reset to front view
+                isPreviewing = false;
+                if (elements.prevPoseBtn) elements.prevPoseBtn.style.display = 'block';
+                if (elements.nextPoseBtn) elements.nextPoseBtn.style.display = 'block';
                 if (elements.posesCarousel) {
                     renderInventory(item.poses, elements.posesCarousel);
+                }
+            } else {
+                const poseIdx = activeOutfit && activeOutfit.poses ? activeOutfit.poses.findIndex(p => p.id === item.id) : -1;
+                if (poseIdx !== -1) {
+                    currentPoseIndex = poseIdx;
+                    isPreviewing = false;
+                    if (elements.prevPoseBtn) elements.prevPoseBtn.style.display = 'block';
+                    if (elements.nextPoseBtn) elements.nextPoseBtn.style.display = 'block';
+                } else {
+                    isPreviewing = true;
+                    if (elements.prevPoseBtn) elements.prevPoseBtn.style.display = 'none';
+                    if (elements.nextPoseBtn) elements.nextPoseBtn.style.display = 'none';
                 }
             }
         });
@@ -720,11 +861,11 @@ document.getElementById('beginRecoveryBtn').addEventListener('click', () => {
     const returnToGameBtn = document.getElementById('returnToGameBtn');
     if (returnToGameBtn) returnToGameBtn.style.display = 'none';
     
-    // Gather all stretch poses from active outfit (exclude basic ones like front/back/jump/celebrate)
-    // Looking at poses, stretches are usually Downward Dog (p1), Sit Stretch (p2), Cobra (p3), Quad (p4), Arm (p5)
-    const stretchPoses = activeOutfit.poses.filter(p => p.id.startsWith('p') && p.id !== 'p0_front' && p.id !== 'p0_back' && p.id !== 'p_cel' && p.id !== 'p_jmp');
+    // Gather all stretch poses explicitly by ID (supporting both male legacy IDs and new female explicit IDs)
+    const stretchPoseIds = ['p_hamstring', 'p_downward_dog', 'p_upward_dog', 'p_standing_thigh', 'p_shoulder', 'p1', 'p2', 'p3', 'p4', 'p5'];
+    const stretchPoses = activeOutfit.poses.filter(p => stretchPoseIds.includes(p.id));
     
-    // Randomize 3 distinct stretches
+    // Randomize distinct stretches
     const shuffled = stretchPoses.sort(() => 0.5 - Math.random());
     const selectedStretches = shuffled.slice(0, 3);
     

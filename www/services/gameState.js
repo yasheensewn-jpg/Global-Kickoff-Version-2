@@ -1070,18 +1070,34 @@ function setupDeveloperOptions() {
 
 window.getCelebrateAvatarUrl = function() {
     const equippedId = localStorage.getItem('gk_equipped_outfit') || window.GK_State?.player?.equippedOutfitId || 'beginner';
+    const gender = localStorage.getItem('gk_equipped_gender') || window.GK_State?.player?.equippedGender || 'male';
     
-    if (equippedId === 'competitive') return '../../assets/locker-room/images/avatars/comp_celebrate.png';
-    if (equippedId === 'beach') return '../../assets/locker-room/images/avatars/beach_celebrate.png';
-    if (equippedId === 'suit') return '../../assets/locker-room/images/avatars/suit_celebrate.png';
-    return '../../assets/locker-room/images/avatars/celebrate.png'; // Default beginner
+    if (gender === 'female') {
+        if (equippedId === 'f_competitive') return '../../assets/locker-room/images/avatars female/F2.Competitive Celebrate.webp';
+        if (equippedId === 'f_beach') return '../../assets/locker-room/images/avatars female/F3.Beach Celebrate.webp';
+        if (equippedId === 'f_suit') return '../../assets/locker-room/images/avatars female/F4.Dress Celebrate.webp';
+        return '../../assets/locker-room/images/avatars female/F1.Base Celebrate1.webp';
+    } else {
+        if (equippedId === 'competitive') return '../../assets/locker-room/images/avatars/comp_celebrate.png';
+        if (equippedId === 'beach') return '../../assets/locker-room/images/avatars/beach_celebrate.png';
+        if (equippedId === 'suit') return '../../assets/locker-room/images/avatars/suit_celebrate.png';
+        return '../../assets/locker-room/images/avatars/celebrate.png'; // Default beginner
+    }
 };
 
 window.getBackAvatarUrl = function() {
     const equippedId = localStorage.getItem('gk_equipped_outfit') || window.GK_State?.player?.equippedOutfitId || 'beginner';
+    const gender = localStorage.getItem('gk_equipped_gender') || window.GK_State?.player?.equippedGender || 'male';
     
-    if (equippedId === 'competitive') return '../../assets/locker-room/images/avatars/comp_back.png';
-    if (equippedId === 'beach') return '../../assets/locker-room/images/avatars/beach_back.png';
-    if (equippedId === 'suit') return '../../assets/locker-room/images/avatars/suit_back.png';
-    return '../../assets/locker-room/images/avatars/base_back.png'; // Default beginner
+    if (gender === 'female') {
+        if (equippedId === 'f_competitive') return '../../assets/locker-room/images/avatars female/F2.Competitive Back.webp';
+        if (equippedId === 'f_beach') return '../../assets/locker-room/images/avatars female/F3.Beach Back.webp';
+        if (equippedId === 'f_suit') return '../../assets/locker-room/images/avatars female/F4.Dress Back.webp';
+        return '../../assets/locker-room/images/avatars female/F1.Base Back.webp';
+    } else {
+        if (equippedId === 'competitive') return '../../assets/locker-room/images/avatars/comp_back.png';
+        if (equippedId === 'beach') return '../../assets/locker-room/images/avatars/beach_back.png';
+        if (equippedId === 'suit') return '../../assets/locker-room/images/avatars/suit_back.png';
+        return '../../assets/locker-room/images/avatars/base_back.png'; // Default beginner
+    }
 };
