@@ -11,6 +11,12 @@ let equippedCleats = false; // Lvl 31+
 let equippedShades = false; // Lvl 31+
 let equippedMuffs = false; // Lvl 31+
 let specialCharges = 0;
+function syncSpecialCharges() {
+    if (!window.GK_State) window.GK_State = {};
+    if (!window.GK_State.economy) window.GK_State.economy = { xp: 0, tokens: 0 };
+    window.GK_State.economy.specialCharges = specialCharges;
+    if (typeof window.saveGameState === 'function') window.saveGameState(false);
+}
 let inMiniGame = false;
 let constellationNodes = [];
 let isAshDashDragging = false;
@@ -116,6 +122,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const globalTokens = document.getElementById('global-tokens');
     if (globalXp) globalXp.innerText = window.GK_State.economy.xp;
     if (globalTokens) globalTokens.innerText = window.GK_State.economy.tokens;
+    
+    if (window.GK_State.economy.specialCharges !== undefined) {
+        specialCharges = window.GK_State.economy.specialCharges;
+        const badge = document.getElementById('special-badge');
+        if (badge) badge.textContent = specialCharges;
+    }
 
   const levelSlider = document.getElementById('level-slider');
   let currentLvl = maxUnlockedLevel;
@@ -129,6 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (levelDisplay) levelDisplay.textContent = currentLvl;
 
   window.addEventListener('gk_state_updated', () => {
+      if (window.GK_State?.economy?.specialCharges !== undefined) {
+          specialCharges = window.GK_State.economy.specialCharges;
+          const badge = document.getElementById('special-badge');
+          if (badge) badge.textContent = specialCharges;
+      }
       if (window.GK_State?.player?.slalomLevel) {
           maxUnlockedLevel = Math.max(maxUnlockedLevel, window.GK_State.player.slalomLevel);
           if (!devUnlockAllLevels) {
@@ -1016,6 +1033,7 @@ function renderCones(level) {
                   specialCharges++;
                   const badge = document.getElementById('special-badge');
                   if (badge) badge.textContent = specialCharges;
+                  syncSpecialCharges();
 
                   const specialGates = document.querySelectorAll('.target-standalone');
                   specialGates.forEach(w => w.style.opacity = '0.2');
@@ -1044,6 +1062,7 @@ function renderCones(level) {
                 specialCharges++;
                 const badge = document.getElementById('special-badge');
                 if (badge) badge.textContent = specialCharges;
+                syncSpecialCharges();
                 obs.isSpecialGate = false; // Prevent double trigger
             }
 
@@ -1789,6 +1808,7 @@ function renderCones(level) {
           specialCharges += 5;
           const badge = document.getElementById('special-badge');
           if (badge) badge.textContent = specialCharges;
+          syncSpecialCharges();
       });
   }
 
@@ -2029,6 +2049,7 @@ function renderCones(level) {
               isTracing = false;
               specialCharges--;
               document.getElementById('special-badge').textContent = specialCharges;
+              syncSpecialCharges();
               
               const currentLvl = parseInt(document.getElementById('level-slider').value, 10) || 1;
               const updateMoveUI = (btnId, purchased) => {
@@ -2074,6 +2095,7 @@ function renderCones(level) {
           // Refund the charge if cancelled early
           specialCharges++;
           document.getElementById('special-badge').textContent = specialCharges;
+          syncSpecialCharges();
       });
   }
 
@@ -2140,9 +2162,10 @@ function renderCones(level) {
               clearTimeout(miniGameTimer);
               constellationOverlay.style.display = 'none';
               inMiniGame = false;
-              // Refund charge
+              // Return charge if failed
               specialCharges++;
               document.getElementById('special-badge').textContent = specialCharges;
+              syncSpecialCharges();
           });
           constellationOverlay.appendChild(closeOverlayBtn);
 

@@ -454,3 +454,42 @@ input, textarea {
 #side-drawer, #hub-drawer, #devPanel {
     z-index: 999999 !important;
 }
+
+/* iOS iPad Pillarboxing & Letterboxing (Native WebKit Detection) */
+@media only screen and (min-width: 768px) and (min-height: 768px) {
+    @supports (-webkit-touch-callout: none) {
+        html, body {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background-color: #000000 !important;
+            height: 100vh !important;
+            width: 100vw !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        #app-container,
+        .app-container,
+        #game-container,
+        #gameContainer,
+        #canvasWrapper,
+        #root {
+            width: 430px !important;
+            height: 932px !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            min-height: auto !important;
+            padding-top: 60px !important; /* Overrides the destructive 15vh */
+            margin: 0 !important;
+            position: relative !important;
+            overflow: hidden !important;
+            border-radius: 35px !important;
+            flex-shrink: 0 !important;
+            box-shadow: 0 0 50px rgba(255,255,255,0.05) !important;
+            transform: scale(1.35) !important;
+            transform-origin: center center !important;
+        }
+    }
+}

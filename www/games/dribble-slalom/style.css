@@ -229,6 +229,29 @@ body, html {
   pointer-events: none; /* Let touches pass through the empty parts of UI layer */
 }
 
+/* Special Move Buttons */
+#special-menu button {
+  height: auto;
+  min-height: 48px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid #333;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  font-size: 18px;
+  width: 90%;
+  max-width: 350px;
+}
+#special-menu button span.special-status-text {
+  margin-left: 10px;
+  margin-top: 0 !important;
+}
+
 .match-state-panel {
   position: absolute;
   top: calc(var(--ios-safe-top, var(--ios-safe-top, var(--ios-safe-top, env(safe-area-inset-top, 0px)))) + 20px);
