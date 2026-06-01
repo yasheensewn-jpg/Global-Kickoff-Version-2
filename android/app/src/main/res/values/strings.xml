@@ -4,4 +4,6 @@
     <string name="title_activity_main">Global Kickoff</string>
     <string name="package_name">com.finandflow.globalkickoff</string>
     <string name="custom_url_scheme">com.finandflow.globalkickoff</string>
+    <string name="facebook_app_id">1552357909707803</string>
+    <string name="facebook_client_token">ba6c9c03c4a308aada9584b5230c6e3e</string>
 </resources>
